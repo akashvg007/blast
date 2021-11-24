@@ -40,6 +40,7 @@ export default ({ setOtpSend, setAgree }) => {
             style={styles.input}
             onChangeText={setNumber}
             placeholder="eg:9946578205"
+            keyboardType='numeric'
             value={number}
           />
         </View>

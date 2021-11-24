@@ -153,10 +153,10 @@ export const getContact = async () => {
 
     }
 }
-export const updateLastSeen = async (payload) => {
+export const updateLastSeen = async () => {
     try {
         const url = baseUrl + getEndpoint('updateLastSeen');
-        const result = await commonPost(url, payload);
+        const result = await commonPost(url, {});
         //console.log("updateLastSeen::result", result);
         return result
     }

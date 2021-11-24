@@ -6,7 +6,7 @@ import { relativeTime } from '../helper/logicHelper';
 import { colors } from '../util/colors';
 
 export default ({
-  data,
+  data=undefined,
   handleSelected,
   name,
   contact,
@@ -18,14 +18,13 @@ export default ({
   let photo =
     'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/1024px-User-avatar.svg.png';
 
-  if (props?.photo[name] && props?.photo[name] !== "") photo = props.photo[name];
+  if (props?.photo && props?.photo !== "") photo = props.photo;
   let contactName = contact || name;
   if (!contact && name === '+918848275018') contactName = 'Admin';
   // console.log("contactname", contact);
 
   const handlePress = () => {
     console.log("pressed this");
-
     handleSelected(name)
   };
   const lastMessage = () => {
@@ -36,7 +35,7 @@ export default ({
     return ""
   }
   useEffect(() => {
-    getLastMessageHelper(data, setLastMsg)
+    if(data) getLastMessageHelper(data, setLastMsg)
   }, [])
   return (
     <TouchableOpacity style={styles.container} onPress={handlePress}>
@@ -46,9 +45,9 @@ export default ({
       <View style={styles.lastMsgContainer}>
         <View style={styles.title}>
           <Text style={styles.text}>{contactName}</Text>
-          <Text style={styles.lastMsg}>{lastMessage()}</Text>
+          {data && <Text style={styles.lastMsg}>{lastMessage()}</Text>}
         </View>
-        <Text >{relativeTime(lastMsg.time)}</Text>
+        {data &&<Text >{relativeTime(lastMsg.time)}</Text>}
       </View>
     </TouchableOpacity>
   );

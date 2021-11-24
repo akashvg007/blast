@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { configureFonts, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import Agree from './pages/AgreeTermsAndCondition';
 import VerifyPhone from './pages/VerifyPhone';
@@ -10,6 +9,7 @@ import {
   getAllContacts, getAllMyChatContacts, clearAllStorage
 } from './helper/logicHelper';
 import { SocketProvider } from "./context/SocketProvider"
+import { updateLastSeen } from './api/service';
 
 export default function App() {
   const [agree, setAgree] = useState(false);
@@ -17,7 +17,6 @@ export default function App() {
   const [verified, setVerified] = useState(false);
   const [chatlist, setChatlist] = useState({})
   const [profilepic, setProfilepic] = useState({})
-  const [loader, setLoader] = useState(false)
 
   //need to do something about the below local state
   const [contact, setContacts] = useState();
@@ -57,8 +56,21 @@ export default function App() {
     setVerified(true)
   }
 
+  const setStartVals = () => {
+    setAgree(false);
+    setOtpSend(false);
+    setVerified(false)
+  }
+
+  const handleUpdateLastTime = () => {
+    setInterval(() => {
+      updateLastSeen();
+    }, 60000)
+  }
+
   useEffect(() => {
     // clearAllStorage();
+    handleUpdateLastTime()
     getLocal("token").then(token => {
       if (token) {
         setInitialStates()
@@ -66,15 +78,16 @@ export default function App() {
         getNewChats();
         getAllContacts()
       }
+      else setStartVals()
     })
-  }, [])
+  }, [verified])
 
   const renderOtpPage = () => {
     if (!agree) return <Agree onAgree={setAgree} />;
     if (!otpSend) return <VerifyPhone setAgree={setAgree} setOtpSend={setOtpSend} />;
     if (!verified) return <VerifyOtp setVerified={setVerified} />;
     return (
-      <SocketProvider id={"+918848275018"}>
+      <SocketProvider id={myPhone}>
         <Dashboard
           dp={profilepic[myPhone]}
           profiles={profilepic}
@@ -85,12 +98,6 @@ export default function App() {
       </SocketProvider>
     );
   };
-  const getMyPhoneAndCallPage = async () => {
-    setLoader(true);
-    myPhone = await getLocal('myphone');
-    renderOtpPage();
-    setLoader(false);
-  }
   return (
     <View style={styles.container}>{renderOtpPage()}</View>
   );

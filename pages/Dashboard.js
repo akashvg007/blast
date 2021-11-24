@@ -1,39 +1,16 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { spaces } from '../util/spaces';
-import ContactList from '../components/ContactList';
 import ChatScreen from './ChatScreen';
 import { colors } from '../util/colors';
-import { Button } from 'react-native-paper';
-import { PermissionsAndroid } from 'react-native';
-import Contacts from 'react-native-contacts';
+import ChatList from './ChatList';
 
 export default function Dashboard({ list = {}, contact = {}, profiles, ...props }) {
   const [currentUser, setCurrentUser] = useState('')
+  const [contactList, setContactList] = useState({});
+  const [showContact, setShowContact] = useState(false)
 
-  // console.log('list', list)
-  // console.log('contact', contact)
-  const handleSelected = (name) => {
-    // setSelected(true);
-    console.log("selected user", name);
 
-    setCurrentUser(name);
-  }
-  const newContact = async () => {
-    PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      {
-        'title': 'Contacts',
-        'message': 'This app would like to view your contacts.',
-        'buttonPositive': 'Please accept bare mortal'
-      }
-    )
-      .then(Contacts.getAll)
-      .then(contacts => {
-        console.log("contacts", contacts);
-
-      }).catch(err => console.log("something went wrong", err))
-  }
   return (
     <View style={styles.container}>
       {currentUser != '' ? (
@@ -41,26 +18,9 @@ export default function Dashboard({ list = {}, contact = {}, profiles, ...props 
           handleBack={setCurrentUser}
           name={currentUser} contact={contact[currentUser]} />
       ) :
-        (
-          <>
-            <View style={styles.heading}>
-              <Text style={styles.headingText}>KEEP IT BLAST</Text>
-              <Button
-                onPress={newContact}
-                color={colors.white}
-                style={styles.newChat}>New Chat</Button>
-            </View>
-            <ScrollView style={styles.chatlist}>
-              {
-                Object.keys(list).map(chat => (
-                  <ContactList contact={contact[chat]}
-                    key={chat}
-                    photo={profiles} name={chat} handleSelected={handleSelected}
-                    data={list[chat]} />
-                ))
-              }
-            </ScrollView>
-          </>)}
+        <ChatList setCurrentUser={setCurrentUser} list={list}
+          contact={contact} profiles={profiles} />
+      }
     </View>
   );
 }

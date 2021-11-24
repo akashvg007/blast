@@ -2,18 +2,35 @@ import React, { useState } from 'react';
 import { Text, View, StyleSheet, TextInput } from 'react-native';
 import RoundedButton from '../components/RoundedButton';
 import { spaces } from '../util/spaces';
-import { countryList } from '../util/data';
+// import { countryList } from '../util/data';
 import { verifyOTP } from '../api/service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  formateChats, getChatsFromLocal,
+  getAllContacts, getLocal
+} from '../helper/logicHelper';
 
 export default ({ setVerified }) => {
   const [otp, setOtp] = useState('');
 
-  const handlePress = async () => {
-    const no = await AsyncStorage.getItem("myphone")
-    const resp = await verifyOTP({ phone: no, otp })
-    AsyncStorage.setItem("token", resp.accessToken);
+  const getInitialDetails = async () => {
+    await getChatsFromLocal();
+    await formateChats();
+    await getAllContacts();
     setVerified(true);
+  }
+
+  const handlePress = async () => {
+    try {
+      const no = await getLocal("myphone")
+      const resp = await verifyOTP({ phone: no, otp })
+      AsyncStorage.setItem("token", resp.accessToken);
+      if (resp.accessToken)
+        getInitialDetails();
+    }
+    catch (err) {
+      console.log("something went wrong");
+    }
   };
 
   return (
@@ -23,6 +40,7 @@ export default ({ setVerified }) => {
           style={styles.input}
           onChangeText={setOtp}
           placeholder="enter OTP"
+          keyboardType='numeric'
           value={otp}
         />
       </View>
@@ -52,6 +70,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderWidth: 1,
     padding: 10,
+    fontSize: 20
   },
   inputWrapper: {
     flex: 0.8,

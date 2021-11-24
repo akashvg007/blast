@@ -2,13 +2,13 @@
   "expo": {
     "name": "keepitblast",
     "slug": "snack-dfc017a0-10da-4781-aa5b-972ac27a1848",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/logo2.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo2.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#111528"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -22,8 +22,8 @@
     "android": {
       "package": "com.akashcorp.keepitblast",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/logo2.png",
+        "backgroundColor": "#111528"
       }
     },
     "web": {

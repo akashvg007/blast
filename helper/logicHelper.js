@@ -145,3 +145,18 @@ export const getUpdatedMessage = async (recipient) => {
     const localChat = await getLocal('localChat');
     return localChat[recipient] || [];
 }
+
+export const getPhoneContacts = async () => {
+    const contacts = await getLocal('phone-contact');
+    const contactMap = {};
+    contacts.forEach(contact => {
+        const { firstName = "", lastName = "", phoneNumbers } = contact;
+        if (phoneNumbers && phoneNumbers.length > 0) {
+            phoneNumbers.forEach(x => {
+                let key = x.number.replace(/\s+|-/g, "");
+                if (!contactMap[key]) contactMap[key] = firstName + lastName + "";
+            })
+        }
+    })
+    return contactMap;
+}

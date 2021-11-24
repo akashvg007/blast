@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, ScrollView, Image, BackHandler } from 'react-na
 import { spaces } from '../util/spaces';
 import { TextInput, IconButton } from 'react-native-paper';
 import moment from 'moment';
+import { getLastSeen } from '../api/service';
 import { getLocal } from '../helper/logicHelper';
 import { colors } from '../util/colors';
 import { useSocket } from '../context/SocketProvider';
@@ -13,6 +14,8 @@ export default function ChatScreen({ photo, name, contact, handleBack, ...props 
     const [myphone, setMyPhone] = useState("")
     const [textInput, setTextInput] = useState("");
     const [localData, setLocalData] = useState([]);
+    const [online, setOnline] = useState('offline');
+    const [lastSeen, SetLastSeen] = useState('');
     const socket = useSocket()
 
     const scrollViewRef = useRef(null)
@@ -54,6 +57,46 @@ export default function ChatScreen({ photo, name, contact, handleBack, ...props 
         await getChatsFromLocal()
         props.getNew();
     }
+    const handleLastSeen = async () => {
+        const result = await getLastSeen({ phone:name });
+        if (!result) return;
+        console.log("last seen",result);
+        
+        const time = result[0]?.lastseen;
+        if (!time) return
+        const date = moment(time).calendar();
+        console.log("date",date);
+        
+        SetLastSeen(date)
+    }
+    
+    const checkOnline = async ({ ids, status }) => {
+        try {
+            // console.log('checkOnline', ids, status);
+            if (ids && Array.isArray(ids) && ids.length && status == 1) {
+                if (ids.includes(name)) {
+                    if(online != 'online') setOnline('online');
+                }
+                else setOnline('offline')
+            }
+            else {
+                setOnline('offline');
+            }
+        }
+        catch (e) {
+            console.log("something went wrong", e.message);
+            setOnline('offline')
+        }
+    }
+    useEffect(() => {
+        handleLastSeen()
+    }, [name, online])
+    useEffect(() => {
+        if (socket == null) return
+        socket.on('online', checkOnline)
+        socket.on('offline', checkOnline)
+    }, [socket, checkOnline])
+
     useEffect(() => {
         getLocal('myphone').then(phone => {
             setMyPhone(phone);
@@ -63,12 +106,14 @@ export default function ChatScreen({ photo, name, contact, handleBack, ...props 
             "hardwareBackPress",
             backAction
         );
-        if (socket !== null)
-            socket.on('receive-message', handleReceive)
+        if (socket == null) return
+        socket.on('receive-message', handleReceive)
         getUpdatedMessage(name)
             .then(data => setLocalData(data))
         return () => backHandler.remove();
     }, []);
+
+    
 
     const handleEmoji = () => {
         return (
@@ -93,7 +138,7 @@ export default function ChatScreen({ photo, name, contact, handleBack, ...props 
                     <Image source={{ uri: DP }} style={styles.dp} />
                     <View style={styles.nameSection}>
                         <Text style={styles.headingText}>{contactName}</Text>
-                        <Text style={styles.online}>online</Text>
+                        <Text style={styles.online}>{online == 'online' ? online : lastSeen}</Text>
                     </View>
                 </View>
             </View>
