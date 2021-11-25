@@ -8,7 +8,7 @@ import { colors } from '../util/colors';
 export default ({
   data=undefined,
   handleSelected,
-  name,
+  phone,
   contact,
   newContact = false,
   ...props
@@ -19,13 +19,13 @@ export default ({
     'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/1024px-User-avatar.svg.png';
 
   if (props?.photo && props?.photo !== "") photo = props.photo;
-  let contactName = contact || name;
-  if (!contact && name === '+918848275018') contactName = 'Admin';
+  let contactName = contact || phone;
+  if (!contact && phone === '+918848275018') contactName = 'Admin';
   // console.log("contactname", contact);
 
   const handlePress = () => {
     console.log("pressed this");
-    handleSelected(name)
+    handleSelected(phone)
   };
   const lastMessage = () => {
     if (lastMsg?.msg) {
@@ -48,6 +48,7 @@ export default ({
           {data && <Text style={styles.lastMsg}>{lastMessage()}</Text>}
         </View>
         {data &&<Text >{relativeTime(lastMsg.time)}</Text>}
+        {props.joinedDate &&<Text >Joined on {relativeTime(props.joinedDate,1)}</Text>}
       </View>
     </TouchableOpacity>
   );

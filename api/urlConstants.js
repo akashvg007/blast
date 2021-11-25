@@ -23,7 +23,8 @@ export const endpoints = {
     upload: '/upload',
     getAllContacts: "/getAllMyUserDetails",
     updateLastSeen: "/update-last-seen",
-    getlastSeenL: "/get-last-seen"
+    getlastSeenL: "/get-last-seen",
+    getBlastsContacts:'/getAllContacts',
 }
 
 export const getEndpoint = (key) => {

@@ -1,46 +1,42 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, ScrollView } from 'react-native';
+import React, { useState,useEffect } from 'react';
+import { Text, View, StyleSheet, ScrollView,ActivityIndicator } from 'react-native';
 import { spaces } from '../util/spaces';
 import ContactList from '../components/ContactList';
 import { colors } from '../util/colors';
 import { Button } from 'react-native-paper';
 import * as Contacts from 'expo-contacts';
-import { setLocal, getPhoneContacts, getLocal } from '../helper/logicHelper';
+import { setLocal, getLocalContacts, getLocal } from '../helper/logicHelper';
 import PhoneContacts from './PhoneContacts';
 
 export default function ChatList({ list = {}, contact = {}, profiles,setCurrentUser }) {
     const [contactList, setContactList] = useState({});
-    const [showContact, setShowContact] = useState(false)
+    const [showContact, setShowContact] = useState(false);
+    const [loader,setLoader] = useState(false);
 
     const handleSelected = (name) => {
         setCurrentUser(name);
     }
     const showContacts = async () => {
-        console.log("showContacts");
-
-        const list = await getPhoneContacts();
+        const list = await getLocal('blastContact');
         console.log("showContacts", list);
         setContactList(list);
         setShowContact(true)
     }
-
+    
     const newContact = async () => {
-        const list = await getLocal('phone-contact');
-        // console.log("list", list);
-
-        if (!list || list.length === 0) {
-            const { status } = await Contacts.requestPermissionsAsync();
-            if (status !== 'granted') return;
-            const { data } = await Contacts.getContactsAsync({
-                fields: [Contacts.Fields.PhoneNumbers]
-            })
-            if (data.length > 0) {
-                // console.log("Contacts list", data);
-                await setLocal('phone-contact', data);
-            }
-        }
-        showContacts();
+        setLoader(true)
+        const { status } = await Contacts.requestPermissionsAsync();
+        if (status !== 'granted') return;
+        const { data } = await Contacts.getContactsAsync({
+            fields: [Contacts.Fields.PhoneNumbers]
+        })
+        if (data.length > 0) await getLocalContacts(data);
+        setLoader(false)
     }
+
+    useEffect(()=>{
+        newContact();
+    },[])
 
     const renderView = () =>{
         if(showContact) return ( 
@@ -52,16 +48,22 @@ export default function ChatList({ list = {}, contact = {}, profiles,setCurrentU
             <View style={styles.heading}>
                 <Text style={styles.headingText}>KEEP IT BLAST</Text>
                 <Button
-                    onPress={newContact}
+                    onPress={showContacts}
                     color={colors.white}
                     style={styles.newChat}>New Chat</Button>
             </View>
             <ScrollView style={styles.chatlist}>
                 {
-                    Object.keys(list).map(chat => (
+                     loader
+                     ?(
+                         <View style={styles.loaderContainer}>
+                             <ActivityIndicator size={100} color={colors.prgreen} />
+                             <Text>loading contacts</Text>
+                         </View>
+                     ):Object.keys(list).map(chat => (
                         <ContactList contact={contact[chat]}
                             key={chat}
-                            photo={profiles[chat]} name={chat} handleSelected={handleSelected}
+                            photo={profiles[chat]} phone={chat} handleSelected={handleSelected}
                             data={list[chat]} />
                     ))
                 }
@@ -71,6 +73,7 @@ export default function ChatList({ list = {}, contact = {}, profiles,setCurrentU
     }
 
     return renderView();
+        
 }
 
 const styles = StyleSheet.create({
@@ -83,6 +86,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 20,
         paddingRight: 20,
+    },
+    loaderContainer:{
+        flex:1,
+        width:'100%',
+        alignItems:'center',
+        height:600,
+        backgroundColor:colors.white,
+        justifyContent:'center'
     },
     headingText: {
         fontSize: spaces.md,

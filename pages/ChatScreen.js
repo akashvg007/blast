@@ -102,14 +102,14 @@ export default function ChatScreen({ photo, name, contact, handleBack, ...props 
             setMyPhone(phone);
             getLocalChat();
         })
+        if (socket == null) return
+        socket.on('receive-message', handleReceive)
+        getUpdatedMessage(name)
+        .then(data => setLocalData(data))
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             backAction
         );
-        if (socket == null) return
-        socket.on('receive-message', handleReceive)
-        getUpdatedMessage(name)
-            .then(data => setLocalData(data))
         return () => backHandler.remove();
     }, []);
 

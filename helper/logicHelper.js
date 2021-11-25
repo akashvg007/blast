@@ -1,12 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import useStore from '../hooks/useStore';
 import { getRecentChats, getContact, getAllMyContacts } from '../api/service';
 import moment from 'moment';
-// import { useSocket } from '../context/SocketProvider';
-import { sendMessage } from '../api/service';
+import { sendMessage,getAllBlastContacts } from '../api/service';
 
-export const relativeTime = (date) => {
+export const relativeTime = (date,st) => {
     const calendar = moment(date).calendar();
+    if(st) return moment(date).format("MMM Do YY"); 
     if (calendar.indexOf('Today at') != '-1') {
         return calendar.substr(calendar.indexOf('at') + 2, calendar.length);
     }
@@ -146,8 +145,7 @@ export const getUpdatedMessage = async (recipient) => {
     return localChat[recipient] || [];
 }
 
-export const getPhoneContacts = async () => {
-    const contacts = await getLocal('phone-contact');
+export const getLocalContacts = async(contacts) => {
     const contactMap = {};
     contacts.forEach(contact => {
         const { firstName = "", lastName = "", phoneNumbers } = contact;
@@ -158,5 +156,21 @@ export const getPhoneContacts = async () => {
             })
         }
     })
-    return contactMap;
+    // await setLocal('phoneContacts',contactMap)
+    getBlastContacts(contactMap)
+}
+
+export const getBlastContacts = async (contacts) => {
+    // const contacts = await getLocal('phoneContacts')
+    const phones = Object.keys(contacts);
+    const blastContacts = await getAllBlastContacts({phones});
+    console.log("blastContacts", blastContacts);
+    const blastContactMap = {}
+    blastContacts.forEach(x=>{
+        const {phone,cr_date,lastseen,profilePic=""}=x;
+        if(!blastContactMap[phone])
+         blastContactMap[phone] = {phone,cr_date,lastseen,profilePic,name:contacts[phone]}
+    })
+    console.log("blastContacts1", blastContactMap);
+    await setLocal("blastContact",blastContactMap);
 }

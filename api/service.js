@@ -178,19 +178,6 @@ export const getLastSeen = async (payload) => {
     }
 }
 
-// export const addContact = async (payload) => {
-//     try {
-//         const url = baseUrl + getEndpoint('addcontact');
-//         const result = await commonPost(url, payload);
-//         //console.log("addContact::result", result);
-//         return result
-//     }
-//     catch (err) {
-//         //console.log("something went wrong", err.message);
-
-//     }
-// }
-
 // export const uploadImages = async (payload) => {
 //     try {
 //         const url = baseUrl + getEndpoint('upload');
@@ -216,6 +203,15 @@ export const getAllMyContacts = async () => {
 
     }
 }
+export const getAllBlastContacts = async (payload) => {
+    try {
+        const url = baseUrl + getEndpoint('getBlastsContacts');
+        const result = await commonPost(url,payload);
+        return result
+    }
+    catch (err) {
+        //console.log("something went wrong", err.message);
 
-
+    }
+}
 
