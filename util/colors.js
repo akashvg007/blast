@@ -11,4 +11,5 @@ export const colors = {
   darkdatebg: '#1e2a30',
   darkfncolor: '#e7e7e8',
   lightfncolor: '#303030',
+  chatBg:'#f1f1f1'
 }
