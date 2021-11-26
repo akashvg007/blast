@@ -14,11 +14,13 @@ import {
 } from "./helper/logicHelper";
 import { SocketProvider } from "./context/SocketProvider";
 import { updateLastSeen } from "./api/service";
+import ProfileSetup from "./pages/ProfileSetup";
 
 export default function App() {
   const [agree, setAgree] = useState(false);
   const [otpSend, setOtpSend] = useState(false);
   const [verified, setVerified] = useState(false);
+  const [initial, setInitial] = useState(false);
   const [chatlist, setChatlist] = useState({});
   const [profilepic, setProfilepic] = useState({});
   const [myphone, setMyPhone] = useState("");
@@ -88,6 +90,7 @@ export default function App() {
     if (!otpSend)
       return <VerifyPhone setAgree={setAgree} setOtpSend={setOtpSend} />;
     if (!verified) return <VerifyOtp setVerified={setVerified} />;
+    if (!initial) return <ProfileSetup dp={profilepic[myphone]} />;
     return (
       <SocketProvider id={myphone}>
         <Dashboard

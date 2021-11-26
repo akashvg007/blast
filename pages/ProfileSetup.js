@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, Image } from "react-native";
 import { colors } from "../util/colors";
-import { spaces } from "../util/spaces";
+import { InputText } from "../components/InputText";
+import { links } from "../util/links";
 import Header from "../components/Header";
 
-export default function Profile({ dp, back, myphone, name }) {
-  const [profileImg, setProfileImg] = useState(null);
+export default function ProfileSetup({ dp }) {
+  const [profileImg, setProfileImg] = useState(links.avatar);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    setProfileImg(dp);
+    console.log("dp", dp);
+
+    if (dp) setProfileImg(dp);
   }, [dp]);
+  console.log("profile", profileImg);
 
   return (
     <View style={styles.container}>
-      <Header text="Profile Settings" back={back} />
+      <Header text="Profile" />
       <View style={styles.imageContainer}>
         <Image
           style={styles.image}
@@ -22,7 +27,7 @@ export default function Profile({ dp, back, myphone, name }) {
           height={200}
         />
       </View>
-      <Text style={styles.details}>{myphone}</Text>
+      <InputText label="Name" value={userName} onChange={setUserName} />
     </View>
   );
 }
@@ -33,16 +38,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     width: "100%",
   },
-  details: {
-    textAlign: "center",
-    fontSize: spaces.md,
-  },
   imageContainer: {
+    backgroundColor: "red",
     height: 250,
     alignItems: "center",
     justifyContent: "center",
   },
   image: {
+    backgroundColor: "green",
     borderRadius: 100,
   },
 });

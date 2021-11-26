@@ -21,6 +21,7 @@ import {
 } from "../helper/logicHelper";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import Profile from "./Profile";
+import { links } from "../util/links";
 
 export default function ChatScreen({
   photo,
@@ -41,8 +42,7 @@ export default function ChatScreen({
   const scrollDown = () =>
     scrollViewRef.current.scrollToEnd({ animated: true });
 
-  let DP =
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/1024px-User-avatar.svg.png";
+  let DP = links.avatar;
   if (photo) DP = photo;
 
   let contactName = contact || name;
