@@ -58,12 +58,14 @@ export default function App() {
     setAgree(true);
     setOtpSend(true);
     setVerified(true);
+    setInitial(true);
   };
 
   const setStartVals = () => {
     setAgree(false);
     setOtpSend(false);
     setVerified(false);
+    setInitial(false);
   };
 
   const handleUpdateLastTime = () => {
@@ -90,7 +92,14 @@ export default function App() {
     if (!otpSend)
       return <VerifyPhone setAgree={setAgree} setOtpSend={setOtpSend} />;
     if (!verified) return <VerifyOtp setVerified={setVerified} />;
-    if (!initial) return <ProfileSetup dp={profilepic[myphone]} />;
+    if (!initial)
+      return (
+        <ProfileSetup
+          dp={profilepic[myphone]}
+          setValues={setInitial}
+          phone={myphone}
+        />
+      );
     return (
       <SocketProvider id={myphone}>
         <Dashboard

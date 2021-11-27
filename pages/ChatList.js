@@ -26,6 +26,7 @@ export default function ChatList({
   const [showContact, setShowContact] = useState(false);
   const [loader, setLoader] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [profileName, setProfileName] = useState("");
 
   const handleSelected = (name) => {
     setCurrentUser(name);
@@ -43,6 +44,8 @@ export default function ChatList({
 
   const newContact = async () => {
     setLoader(true);
+    const un = await getLocal("myname");
+    setProfileName(un);
     const { status } = await Contacts.requestPermissionsAsync();
     if (status !== "granted") return;
     const { data } = await Contacts.getContactsAsync({
@@ -71,6 +74,8 @@ export default function ChatList({
           dp={profiles[myphone]}
           myphone={myphone}
           back={setShowProfile}
+          edit={true}
+          name={profileName}
         />
       );
     return (

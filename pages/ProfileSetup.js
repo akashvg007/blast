@@ -1,33 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
 import { colors } from "../util/colors";
 import { InputText } from "../components/InputText";
-import { links } from "../util/links";
 import Header from "../components/Header";
+import { ButtonGrp } from "../components/ButtonGroup";
+import { Uploader } from "../components/Uploader";
+import { updateName } from "../api/service";
 
-export default function ProfileSetup({ dp }) {
-  const [profileImg, setProfileImg] = useState(links.avatar);
-  const [userName, setUserName] = useState("");
+export default function ProfileSetup({ dp, setValues, phone }) {
+  const [name, setName] = useState("");
 
-  useEffect(() => {
-    console.log("dp", dp);
-
-    if (dp) setProfileImg(dp);
-  }, [dp]);
-  console.log("profile", profileImg);
+  const handlePress = async () => {
+    if (name === "") return;
+    await updateName({ name, phone });
+    setValues(true);
+  };
+  const btns = [
+    // { title: "SKIP", press: () => setValues(true) },
+    { title: "NEXT", press: handlePress },
+  ];
 
   return (
     <View style={styles.container}>
       <Header text="Profile" />
-      <View style={styles.imageContainer}>
-        <Image
-          style={styles.image}
-          source={{ uri: profileImg }}
-          width={200}
-          height={200}
-        />
-      </View>
-      <InputText label="Name" value={userName} onChange={setUserName} />
+      <Uploader dp={dp} />
+      <InputText label="Enter Your Name" value={name} onChange={setName} />
+      <ButtonGrp data={btns} />
     </View>
   );
 }
@@ -37,15 +35,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     width: "100%",
-  },
-  imageContainer: {
-    backgroundColor: "red",
-    height: 250,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    backgroundColor: "green",
-    borderRadius: 100,
   },
 });

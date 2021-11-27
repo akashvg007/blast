@@ -1,14 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  ScrollView,
-  Image,
-  BackHandler,
-} from "react-native";
-import { spaces } from "../util/spaces";
-import { TextInput, IconButton } from "react-native-paper";
+import { Text, View, StyleSheet, ScrollView, BackHandler } from "react-native";
 import moment from "moment";
 import { getLastSeen } from "../api/service";
 import { getLocal } from "../helper/logicHelper";
@@ -19,9 +10,11 @@ import {
   getChatsFromLocal,
   getUpdatedMessage,
 } from "../helper/logicHelper";
-import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import Profile from "./Profile";
 import { links } from "../util/links";
+import ChatHeader from "../components/ChatHeader";
+import ChatInput from "../components/ChatInput";
+import { spaces } from "../util/spaces";
 
 export default function ChatScreen({
   photo,
@@ -66,9 +59,6 @@ export default function ChatScreen({
     const data = await getUpdatedMessage(name);
     setLocalData(data);
   };
-  const clickBack = () => {
-    handleBack("");
-  };
   const backAction = () => {
     handleBack("");
     return true;
@@ -77,7 +67,7 @@ export default function ChatScreen({
     await getChatsFromLocal();
     props.getNew();
   };
-  async function handleLastSeen(): Promise<void> {
+  async function handleLastSeen() {
     const result = await getLastSeen({ phone: name });
     if (!result) return;
     const time = result[0]?.lastseen;
@@ -119,14 +109,6 @@ export default function ChatScreen({
     return () => backHandler.remove();
   }, []);
 
-  const handleEmoji = () => {
-    return (
-      <EmojiSelector
-        category={Categories.symbols}
-        onEmojiSelected={(emoji) => console.log(emoji)}
-      />
-    );
-  };
   const handleProfile = () => {
     setShowProfile(true);
   };
@@ -143,26 +125,14 @@ export default function ChatScreen({
 
   return (
     <View style={styles.container}>
-      <View style={styles.heading}>
-        <View style={styles.hleft}>
-          <IconButton
-            icon={(prop) => <Image source={require("../assets/arrowLT.png")} />}
-            size={20}
-            onPress={clickBack}
-            hasTVPreferredFocus={undefined}
-            tvParallaxProperties={undefined}
-          />
-          <Image source={{ uri: DP }} style={styles.dp} />
-          <View style={styles.nameSection}>
-            <Text onPress={handleProfile} style={styles.headingText}>
-              {contactName}
-            </Text>
-            <Text style={styles.online}>
-              {online == "online" ? online : lastSeen}
-            </Text>
-          </View>
-        </View>
-      </View>
+      <ChatHeader
+        DP={DP}
+        back={backAction}
+        profile={handleProfile}
+        online={online}
+        name={contactName}
+        lastSeen={lastSeen}
+      />
       <ScrollView
         style={{ backgroundColor: colors.chatBg }}
         ref={scrollViewRef}
@@ -206,16 +176,17 @@ export default function ChatScreen({
                       ]}
                     >
                       <Text style={styles.message}>{chat.msg}</Text>
-                      <View
+
+                      <Text
                         style={[
                           styles.time,
                           chat.from === myphone
-                            ? styles.rightSide
-                            : styles.leftSide,
+                            ? styles.rightTime
+                            : styles.leftTime,
                         ]}
                       >
-                        <Text>{moment(chat.time).format("LT")}</Text>
-                      </View>
+                        {moment(chat.time).format("LT")}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -223,37 +194,12 @@ export default function ChatScreen({
             })}
         </View>
       </ScrollView>
-      <View>
-        <TextInput
-          style={styles.textInput}
-          multiline
-          placeholder="Type a Message"
-          onChangeText={setTextInput}
-          value={textInput}
-          left={
-            <TextInput.Icon
-              style={styles.emoji}
-              onPress={handleEmoji}
-              name={require("../assets/emoticon-happy.png")}
-            />
-          }
-          right={<TextInput.Icon onPress={handleSend} name="send" />}
-        />
-      </View>
+      <ChatInput text={textInput} setText={setTextInput} send={handleSend} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  textInput: {
-    backgroundColor: "#fff",
-    borderRadius: 15,
-  },
-  emoji: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
   chatContainer: {
     flexGrow: 1,
     width: "100%",
@@ -264,13 +210,12 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     width: "100%",
+    flexDirection: "row",
   },
   rightSide: {
-    flexDirection: "row",
     justifyContent: "flex-end",
   },
   leftSide: {
-    flexDirection: "row",
     justifyContent: "flex-start",
   },
   chat: {
@@ -285,6 +230,14 @@ const styles = StyleSheet.create({
   },
   rightChat: {
     backgroundColor: colors.prchatbg,
+  },
+  rightTime: {
+    textAlign: "right",
+    width: "100%",
+  },
+  leftTime: {
+    width: "100%",
+    textAlign: "left",
   },
   dateWrapper: {
     paddingTop: 10,
@@ -301,8 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 7.5,
   },
   time: {
-    fontSize: 10,
-    fontFamily: "Rubik-Regular",
+    fontSize: spaces.xsm,
     paddingLeft: 5,
   },
   chatDate: {
@@ -315,37 +267,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     color: colors.black,
     width: "100%",
-  },
-  hleft: {
-    width: "60%",
-    flexDirection: "row",
-  },
-  hright: {
-    width: "40%",
-  },
-  heading: {
-    backgroundColor: colors.bggreen,
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-    height: 50,
-    alignItems: "center",
-    paddingLeft: 5,
-  },
-  dp: {
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-  },
-  nameSection: {
-    paddingLeft: spaces.sm,
-  },
-  headingText: {
-    fontSize: spaces.md,
-    color: colors.white,
-  },
-  online: {
-    fontSize: spaces.xsm,
-    color: colors.white,
   },
 });
