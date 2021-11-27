@@ -9,6 +9,7 @@ export default function Dashboard({
   contact = {},
   profiles,
   myphone,
+  getProfilePic,
   ...props
 }) {
   const [currentUser, setCurrentUser] = useState("");
@@ -21,9 +22,11 @@ export default function Dashboard({
           handleBack={setCurrentUser}
           name={currentUser}
           contact={contact[currentUser]}
+          getProfilePic={getProfilePic}
         />
       ) : (
         <ChatList
+          getProfilePic={getProfilePic}
           myphone={myphone}
           setCurrentUser={setCurrentUser}
           list={list}

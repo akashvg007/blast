@@ -194,3 +194,13 @@ export const updateName = async (payload) => {
     console.log("something went wrong", err.message);
   }
 };
+
+export const removePhoto = async () => {
+  try {
+    const url = baseUrl + getEndpoint("removePhoto");
+    const result = await commonGet(url);
+    return result;
+  } catch (err) {
+    console.log("something went wrong", err.message);
+  }
+};

@@ -7,7 +7,7 @@ import { ButtonGrp } from "../components/ButtonGroup";
 import { Uploader } from "../components/Uploader";
 import { updateName } from "../api/service";
 
-export default function ProfileSetup({ dp, setValues, phone }) {
+export default function ProfileSetup({ dp, setValues, phone, getProfilePic }) {
   const [name, setName] = useState("");
 
   const handlePress = async () => {
@@ -23,7 +23,7 @@ export default function ProfileSetup({ dp, setValues, phone }) {
   return (
     <View style={styles.container}>
       <Header text="Profile" />
-      <Uploader dp={dp} />
+      <Uploader dp={dp} getProfilePic={getProfilePic} name={name} />
       <InputText label="Enter Your Name" value={name} onChange={setName} />
       <ButtonGrp data={btns} />
     </View>

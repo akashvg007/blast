@@ -14,6 +14,7 @@ import * as Contacts from "expo-contacts";
 import { getLocalContacts, getLocal } from "../helper/logicHelper";
 import PhoneContacts from "./PhoneContacts";
 import Profile from "./Profile";
+import { Fullscreen } from "../components/Fullscreen";
 
 export default function ChatList({
   list = {},
@@ -21,12 +22,14 @@ export default function ChatList({
   profiles,
   setCurrentUser,
   myphone,
+  getProfilePic,
 }) {
   const [contactList, setContactList] = useState({});
   const [showContact, setShowContact] = useState(false);
   const [loader, setLoader] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileName, setProfileName] = useState("");
+  const [fullscreen, setFullscreen] = useState({});
 
   const handleSelected = (name) => {
     setCurrentUser(name);
@@ -71,11 +74,21 @@ export default function ChatList({
     if (showProfile)
       return (
         <Profile
+          getProfilePic={getProfilePic}
           dp={profiles[myphone]}
           myphone={myphone}
           back={setShowProfile}
           edit={true}
           name={profileName}
+        />
+      );
+    if (Object.keys(fullscreen).length > 0)
+      return (
+        <Fullscreen
+          back={setFullscreen}
+          dp={fullscreen.photo}
+          name={fullscreen.contactName}
+          type="object"
         />
       );
     return (
@@ -101,6 +114,7 @@ export default function ChatList({
           ) : (
             Object.keys(list).map((chat) => (
               <ContactList
+                viewDP={setFullscreen}
                 contact={contact[chat]}
                 key={chat}
                 photo={profiles[chat]}

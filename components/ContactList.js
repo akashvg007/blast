@@ -12,6 +12,7 @@ export default ({
   contact,
   newContact = false,
   joinedDate,
+  viewDP,
   ...props
 }) => {
   const [lastMsg, setLastMsg] = useState({});
@@ -30,9 +31,13 @@ export default ({
   const lastMessage = () => {
     if (lastMsg?.msg) {
       const { msg } = lastMsg;
-      return msg.length > 20 ? msg.substring(0, 20) + "..." : msg;
+      return msg.length > 20 ? msg.substring(0, 25) + "..." : msg;
     }
     return "";
+  };
+  const viewImage = (e) => {
+    e.stopPropagation();
+    viewDP({ photo, contactName });
   };
   useEffect(() => {
     if (data) getLastMessageHelper(data, setLastMsg);
@@ -40,7 +45,9 @@ export default ({
   return (
     <TouchableOpacity style={styles.container} onPress={handlePress}>
       <View>
-        <Image source={{ uri: photo }} style={styles.dp} />
+        <TouchableOpacity onPress={viewImage}>
+          <Image source={{ uri: photo }} style={styles.dp} />
+        </TouchableOpacity>
       </View>
       <View style={styles.lastMsgContainer}>
         <View style={styles.title}>

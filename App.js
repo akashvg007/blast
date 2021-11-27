@@ -41,8 +41,6 @@ export default function App() {
   };
   const getAndSetNewContacts = async () => {
     const data = await getAllMyChatContacts();
-    // console.log("contacts", data);
-
     setProfilepic(data);
   };
 
@@ -71,7 +69,7 @@ export default function App() {
   const handleUpdateLastTime = () => {
     setInterval(() => {
       updateLastSeen();
-    }, 60000);
+    }, 120000);
   };
 
   useEffect(() => {
@@ -98,11 +96,13 @@ export default function App() {
           dp={profilepic[myphone]}
           setValues={setInitial}
           phone={myphone}
+          getProfilePic={getAndSetNewContacts}
         />
       );
     return (
       <SocketProvider id={myphone}>
         <Dashboard
+          getProfilePic={getAndSetNewContacts}
           myphone={myphone}
           profiles={profilepic}
           getAllContacts={getAllContacts}

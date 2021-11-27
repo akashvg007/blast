@@ -25,6 +25,7 @@ export const endpoints = {
   getlastSeenL: "/get-last-seen",
   getBlastsContacts: "/getAllContacts",
   updateName: "/update/name",
+  removePhoto: "/remove/profile",
 };
 
 export const getEndpoint = (key) => {

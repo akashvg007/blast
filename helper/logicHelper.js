@@ -164,22 +164,25 @@ export const getLocalContacts = async (contacts) => {
 };
 
 export const getBlastContacts = async (contacts) => {
-  // const contacts = await getLocal('phoneContacts')
-  const phones = Object.keys(contacts);
-  const blastContacts = await getAllBlastContacts({ phones });
-  console.log("blastContacts", blastContacts);
-  const blastContactMap = {};
-  blastContacts.forEach((x) => {
-    const { phone, cr_date, lastseen, profilePic = "" } = x;
-    if (!blastContactMap[phone])
-      blastContactMap[phone] = {
-        phone,
-        cr_date,
-        lastseen,
-        profilePic,
-        name: contacts[phone],
-      };
-  });
-  console.log("blastContacts1", blastContactMap);
-  await setLocal("blastContact", blastContactMap);
+  try {
+    const phones = Object.keys(contacts);
+    const blastContacts = await getAllBlastContacts({ phones });
+    console.log("blastContacts", blastContacts);
+    const blastContactMap = {};
+    blastContacts.forEach((x) => {
+      const { phone, cr_date, lastseen, profilePic = "" } = x;
+      if (!blastContactMap[phone])
+        blastContactMap[phone] = {
+          phone,
+          cr_date,
+          lastseen,
+          profilePic,
+          name: contacts[phone],
+        };
+    });
+    console.log("blastContacts1", blastContactMap);
+    await setLocal("blastContact", blastContactMap);
+  } catch (e) {
+    console.log("getBlastContacts", e.message);
+  }
 };

@@ -1,17 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, BackHandler } from "react-native";
 import { colors } from "../util/colors";
 import Header from "../components/Header";
 import { Uploader } from "../components/Uploader";
 import ProfileText from "../components/CommonText";
 import Space from "../components/Space";
+import { Fullscreen } from "../components/Fullscreen";
 
-export default function Profile({ dp, back, myphone, name = "user", edit }) {
-  return (
+export default function Profile({
+  dp,
+  back,
+  myphone,
+  name = "user",
+  edit,
+  getProfilePic,
+}) {
+  const [fullscreen, setFullscreen] = useState(false);
+  const backAction = () => {
+    back(false);
+    return true;
+  };
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
+  }, []);
+
+  return fullscreen ? (
+    <Fullscreen back={setFullscreen} dp={dp} name={name} />
+  ) : (
     <View style={styles.container}>
       <Header text="Profile Settings" back={back} />
       <Space />
-      <Uploader dp={dp} edit={edit} />
+      <Uploader
+        dp={dp}
+        edit={edit}
+        getProfilePic={getProfilePic}
+        name={name}
+        showImg={setFullscreen}
+      />
       <Space />
       <ProfileText title={name} label="Name" />
       <Space />

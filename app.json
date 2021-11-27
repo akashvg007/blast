@@ -2,14 +2,16 @@
   "expo": {
     "name": "keepitblast",
     "slug": "snack-dfc017a0-10da-4781-aa5b-972ac27a1848",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/logo2.png",
     "plugins": [
       [
         "expo-image-picker",
         {
-          "photosPermission": "Blast required permission to access your photos."
+          "photosPermission": "Allow Blast to access your photos",
+          "cameraPermission":"Allow Blast to access your camera",
+          "microphonePermission":"Allow Blast to access your microphone"
         }
       ]
     ],

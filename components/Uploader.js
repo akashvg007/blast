@@ -1,51 +1,34 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { IconButton } from "react-native-paper";
 import { links } from "../util/links";
-import * as ImagePicker from "expo-image-picker";
-import { uploadImages } from "../api/service";
 import { colors } from "../util/colors";
+import RBSheet from "react-native-raw-bottom-sheet";
+import ProfileChangeOptions from "./ProfileChangeOption";
 
-export const Uploader = ({ dp, edit = false }) => {
+export const Uploader = ({ dp, edit = false, getProfilePic, showImg }) => {
   const [profileImg, setProfileImg] = useState(links.avatar);
+  const refRBSheet = useRef();
 
   useEffect(() => {
     if (dp) setProfileImg(dp);
-  }, [dp]);
-
-  useEffect(() => {
-    (async () => {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
-      }
-    })();
-  }, []);
+    else setProfileImg(links.avatar);
+    getProfilePic();
+  }, [dp, profileImg]);
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 0.9,
-    });
-    if (!result.cancelled) {
-      const { uri } = result;
-      const body = new FormData();
-      body.append("file", uri);
-      await uploadImages(body);
-      setProfileImg(uri);
-    }
+    refRBSheet.current.open();
   };
   return (
     <View style={styles.imageContainer}>
-      <Image
-        style={styles.image}
-        source={{ uri: profileImg }}
-        width={200}
-        height={200}
-      />
+      <TouchableOpacity onPress={(e) => showImg(true)}>
+        <Image
+          style={styles.image}
+          source={{ uri: profileImg }}
+          width={200}
+          height={200}
+        />
+      </TouchableOpacity>
       {edit && (
         <View style={styles.iconWrapper}>
           <IconButton
@@ -58,6 +41,22 @@ export const Uploader = ({ dp, edit = false }) => {
           />
         </View>
       )}
+      <RBSheet
+        ref={refRBSheet}
+        closeOnDragDown={true}
+        closeOnPressMask={true}
+        height={200}
+        customStyles={{
+          wrapper: {
+            backgroundColor: "transparent",
+          },
+          draggableIcon: {
+            backgroundColor: "#000",
+          },
+        }}
+      >
+        <ProfileChangeOptions setDp={setProfileImg} />
+      </RBSheet>
     </View>
   );
 };

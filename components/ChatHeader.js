@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import { colors } from "../util/colors";
 import { spaces } from "../util/spaces";
 import { IconButton } from "react-native-paper";
+import { Entypo } from "@expo/vector-icons";
 
 export default function ChatHeader({
   DP,
@@ -34,6 +35,20 @@ export default function ChatHeader({
           </Text>
         </View>
       </View>
+      <View>
+        <Entypo
+          style={styles.menu}
+          name="dots-three-vertical"
+          size={24}
+          onPress={() => console.log("Pressed")}
+          color={colors.white}
+        />
+        {/* <IconButton
+          icon="email"
+          size={20}
+          onPress={() => console.log("Pressed")}
+        /> */}
+      </View>
     </View>
   );
 }
@@ -42,6 +57,9 @@ const styles = StyleSheet.create({
   hleft: {
     width: "60%",
     flexDirection: "row",
+  },
+  menu: {
+    paddingRight: 10,
   },
   hright: {
     width: "40%",
