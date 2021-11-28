@@ -15,6 +15,7 @@ import { getLocalContacts, getLocal } from "../helper/logicHelper";
 import PhoneContacts from "./PhoneContacts";
 import Profile from "./Profile";
 import { Fullscreen } from "../components/Fullscreen";
+import { SnackBar } from "../components/SnackBar";
 
 export default function ChatList({
   list = {},
@@ -30,6 +31,7 @@ export default function ChatList({
   const [showProfile, setShowProfile] = useState(false);
   const [profileName, setProfileName] = useState("");
   const [fullscreen, setFullscreen] = useState({});
+  const [showSnack, setShowSnack] = useState(false);
 
   const handleSelected = (name) => {
     setCurrentUser(name);
@@ -47,6 +49,7 @@ export default function ChatList({
 
   const turnOffLoader = () => {
     setTimeout(() => {
+      setShowSnack(true);
       setLoader(false);
     }, 5000);
   };
@@ -56,11 +59,17 @@ export default function ChatList({
     turnOffLoader();
     const un = await getLocal("myname");
     setProfileName(un);
-    const { status } = await Contacts.requestPermissionsAsync();
-    if (status !== "granted") return;
+    const { status, granted } = await Contacts.requestPermissionsAsync();
+    console.log("status", status, granted);
+    if (!granted) {
+      setLoader(false);
+      return;
+    }
     const { data } = await Contacts.getContactsAsync({
       fields: [Contacts.Fields.PhoneNumbers],
     });
+    console.log("data", data);
+
     if (data.length > 0) await getLocalContacts(data);
     setLoader(false);
   };
@@ -131,6 +140,11 @@ export default function ChatList({
               />
             ))
           )}
+          <SnackBar
+            show={showSnack}
+            duration={15000}
+            title="Failed to load contacts"
+          />
         </ScrollView>
       </>
     );
@@ -165,6 +179,7 @@ const styles = StyleSheet.create({
   chatlist: {
     overflow: "scroll",
     flexGrow: 1,
+    position: "relative",
   },
   newChat: {
     fontFamily: "Montserrat-Bold",
