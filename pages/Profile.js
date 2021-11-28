@@ -6,21 +6,28 @@ import { Uploader } from "../components/Uploader";
 import ProfileText from "../components/CommonText";
 import Space from "../components/Space";
 import { Fullscreen } from "../components/Fullscreen";
+import { getLocal } from "../helper/logicHelper";
 
 export default function Profile({
   dp,
   back,
   myphone,
-  name = "user",
+  name,
   edit,
   getProfilePic,
 }) {
   const [fullscreen, setFullscreen] = useState(false);
+  const [userName, setUserName] = useState(name);
   const backAction = () => {
     back(false);
     return true;
   };
+  const getLocalName = async () => {
+    const un = await getLocal("myname");
+    setUserName(un);
+  };
   useEffect(() => {
+    if (!name) getLocalName();
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
@@ -29,7 +36,7 @@ export default function Profile({
   }, []);
 
   return fullscreen ? (
-    <Fullscreen back={setFullscreen} dp={dp} name={name} />
+    <Fullscreen back={setFullscreen} dp={dp} name={userName} />
   ) : (
     <View style={styles.container}>
       <Header text="Profile Settings" back={back} />
@@ -38,11 +45,11 @@ export default function Profile({
         dp={dp}
         edit={edit}
         getProfilePic={getProfilePic}
-        name={name}
+        name={userName}
         showImg={setFullscreen}
       />
       <Space />
-      <ProfileText title={name} label="Name" />
+      <ProfileText title={userName} label="Name" />
       <Space />
       <ProfileText title={myphone} label="Phone" />
     </View>

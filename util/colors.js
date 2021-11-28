@@ -15,4 +15,5 @@ export const colors = {
   fngreen: "#1fa855",
   fnShade: "rgba(0,0,0,0.45)",
   profileBg: "#ededed",
+  bluetick: "#00a5f4",
 };

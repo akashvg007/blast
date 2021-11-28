@@ -1,10 +1,13 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import moment from "moment";
+import moment, { fn } from "moment";
 import { colors } from "../util/colors";
 import { spaces } from "../util/spaces";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ChatMessage({ myphone, localData }) {
+  console.log("localdata", localData[0]);
+
   return (
     <View style={{ flexDirection: "column-reverse" }}>
       {localData &&
@@ -49,6 +52,16 @@ export default function ChatMessage({ myphone, localData }) {
                     ]}
                   >
                     {moment(chat.time).format("LT")}
+                    {chat.from == myphone && (
+                      <Ionicons
+                        // name={`checkmark${chat.status == 2 ? "-done" : ""}`}
+                        name={`checkmark-done`}
+                        size={18}
+                        color={
+                          chat.status == 2 ? colors.bluetick : colors.fnShade
+                        }
+                      />
+                    )}
                   </Text>
                 </View>
               </View>

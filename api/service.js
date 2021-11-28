@@ -204,3 +204,14 @@ export const removePhoto = async () => {
     console.log("something went wrong", err.message);
   }
 };
+
+export const updateStatus = async (phone) => {
+  try {
+    const url = baseUrl + getEndpoint("statusUpdate", "phone", phone);
+    console.log("updateStatus::url", url);
+    const result = await commonGet(url);
+    return result;
+  } catch (err) {
+    console.log("something went wrong", err.message);
+  }
+};

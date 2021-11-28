@@ -104,12 +104,10 @@ export const getAllContacts = async () => {
 
 export const getAllMyChatContacts = async () => {
   try {
-    const myphone = await getLocal("myphone");
     const list = await getAllMyContacts();
     const profilePicData = {};
     list.forEach((profile) => {
-      const { profilePic = "", phone, name = "" } = profile;
-      if (phone === myphone) setLocal("myname", name);
+      const { profilePic = "", phone } = profile;
       if (!profilePicData[phone]) profilePicData[phone] = profilePic;
     });
     // //console.log("dp1", profilePicData);
@@ -148,6 +146,14 @@ export const getUpdatedMessage = async (recipient) => {
   return localChat[recipient] || [];
 };
 
+export const updateLocalChatStatus = async (recipient) => {
+  const localChat = await getUpdatedMessage(recipient);
+  localChat.map((chat) => {
+    if (chat.from === recipient) return { ...chat, status: 2 };
+    return chat;
+  });
+};
+
 export const getLocalContacts = async (contacts) => {
   const contactMap = {};
   contacts.forEach((contact) => {
@@ -167,7 +173,7 @@ export const getBlastContacts = async (contacts) => {
   try {
     const phones = Object.keys(contacts);
     const blastContacts = await getAllBlastContacts({ phones });
-    console.log("blastContacts", blastContacts);
+    // console.log("blastContacts", blastContacts);
     const blastContactMap = {};
     blastContacts.forEach((x) => {
       const { phone, cr_date, lastseen, profilePic = "" } = x;
@@ -180,7 +186,7 @@ export const getBlastContacts = async (contacts) => {
           name: contacts[phone],
         };
     });
-    console.log("blastContacts1", blastContactMap);
+    // console.log("blastContacts1", blastContactMap);
     await setLocal("blastContact", blastContactMap);
   } catch (e) {
     console.log("getBlastContacts", e.message);

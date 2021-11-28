@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "keepitblast",
-    "slug": "snack-dfc017a0-10da-4781-aa5b-972ac27a1848",
-    "version": "1.0.6",
+    "name": "Blast",
+    "slug": "blast",
+    "version": "1.0.9",
     "orientation": "portrait",
     "icon": "./assets/logo2.png",
     "plugins": [
@@ -34,7 +34,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo2.png",
         "backgroundColor": "#111528"
-      }
+      },
+      "permissions":["READ_CONTACTS","CAMERA","VIBRATE","ACCESS_BACKGROUND_LOCATION"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

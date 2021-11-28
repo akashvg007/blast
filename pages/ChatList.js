@@ -49,33 +49,31 @@ export default function ChatList({
 
   const turnOffLoader = () => {
     setTimeout(() => {
-      setShowSnack(true);
       setLoader(false);
     }, 5000);
   };
-
-  const newContact = async () => {
-    setLoader(true);
-    turnOffLoader();
-    const un = await getLocal("myname");
-    setProfileName(un);
-    const { status, granted } = await Contacts.requestPermissionsAsync();
-    console.log("status", status, granted);
-    if (!granted) {
-      setLoader(false);
-      return;
-    }
-    const { data } = await Contacts.getContactsAsync({
-      fields: [Contacts.Fields.PhoneNumbers],
-    });
-    console.log("data", data);
-
-    if (data.length > 0) await getLocalContacts(data);
-    setLoader(false);
-  };
-
   useEffect(() => {
-    newContact();
+    (async () => {
+      const un = await getLocal("myname");
+      setProfileName(un);
+      const isAvailable = await Contacts.isAvailableAsync();
+      console.log("available", isAvailable);
+      if (!isAvailable) alert("this device does not support contact api");
+      const { granted } = await Contacts.requestPermissionsAsync();
+      if (!granted) {
+        const permission = await Contacts.getPermissionsAsync();
+        if (!permission.granted) {
+          alert("please grand permission to access the contacts");
+          return;
+        }
+      }
+      const resp = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.PhoneNumbers],
+      });
+      console.log("response", Object.keys(resp));
+      // alert("total contacts: " + resp.total);
+      if (resp.data.length > 0) await getLocalContacts(resp.data);
+    })();
   }, []);
 
   const renderView = () => {
@@ -111,8 +109,11 @@ export default function ChatList({
       <>
         <View style={styles.heading}>
           <Text onPress={handleProfile} style={styles.headingText}>
-            KEEP IT BLAST
+            BLAST
           </Text>
+          {/* <Text onPress={showContacts} style={styles.headingText}>
+            NEW CHAT
+          </Text> */}
           <Button
             onPress={showContacts}
             color={colors.white}
@@ -137,13 +138,14 @@ export default function ChatList({
                 phone={chat}
                 handleSelected={handleSelected}
                 data={list[chat]}
+                joinedDate={undefined}
               />
             ))
           )}
           <SnackBar
             show={showSnack}
-            duration={15000}
             title="Failed to load contacts"
+            duration={undefined}
           />
         </ScrollView>
       </>

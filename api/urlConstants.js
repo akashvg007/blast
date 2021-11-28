@@ -26,8 +26,14 @@ export const endpoints = {
   getBlastsContacts: "/getAllContacts",
   updateName: "/update/name",
   removePhoto: "/remove/profile",
+  statusUpdate: "/update/status/:phone",
 };
 
-export const getEndpoint = (key) => {
-  return "/user" + endpoints[key];
+export const getEndpoint = (key, id, value) => {
+  if (key == "statusUpdate") console.log("id::value", id, value);
+
+  let url = "";
+  if (id && value) url = endpoints[key].replace(id, value);
+  else url = endpoints[key];
+  return "/user" + url;
 };

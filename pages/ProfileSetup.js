@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import { ButtonGrp } from "../components/ButtonGroup";
 import { Uploader } from "../components/Uploader";
 import { updateName } from "../api/service";
+import { setLocal } from "../helper/logicHelper";
 
 export default function ProfileSetup({ dp, setValues, phone, getProfilePic }) {
   const [name, setName] = useState("");
@@ -13,6 +14,7 @@ export default function ProfileSetup({ dp, setValues, phone, getProfilePic }) {
   const handlePress = async () => {
     if (name === "") return;
     await updateName({ name, phone });
+    await setLocal("myname", name);
     setValues(true);
   };
   const btns = [

@@ -52,11 +52,12 @@ export default function App() {
   };
   const setInitialStates = async () => {
     const phone = await getLocal("myphone");
+    const name = await getLocal("myname");
     setMyPhone(phone);
     setAgree(true);
     setOtpSend(true);
     setVerified(true);
-    setInitial(true);
+    if (name) setInitial(true);
   };
 
   const setStartVals = () => {
@@ -69,13 +70,13 @@ export default function App() {
   const handleUpdateLastTime = () => {
     setInterval(() => {
       updateLastSeen();
-    }, 120000);
+    }, 60000);
   };
 
   useEffect(() => {
     // clearAllStorage();
     handleUpdateLastTime();
-    getLocal("token").then((token) => {
+    getLocal("token").then(async (token) => {
       if (token) {
         setInitialStates();
         getInitialValues();

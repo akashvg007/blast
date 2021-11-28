@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ScrollView, BackHandler } from "react-native";
 import moment from "moment";
-import { getLastSeen } from "../api/service";
+import { getLastSeen, updateStatus } from "../api/service";
 import { getLocal } from "../helper/logicHelper";
 import { colors } from "../util/colors";
 import { useSocket } from "../context/SocketProvider";
@@ -110,6 +110,13 @@ export default function ChatScreen({
     return () => backHandler.remove();
   }, []);
 
+  // useEffect(() => {
+  //   if (name){
+  //      updateStatus(name);
+
+  //     }
+  // }, [localData]);
+
   const handleProfile = () => {
     setShowProfile(true);
   };
@@ -121,6 +128,7 @@ export default function ChatScreen({
         name={contactName}
         back={setShowProfile}
         getProfilePic={getProfilePic}
+        edit={undefined}
       />
     );
   }
