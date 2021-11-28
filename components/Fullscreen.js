@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     height: "85%",
   },
   image: {
-    width: "100%",
+    maxWidth: "100%",
     height: "100%",
     minHeight: 400,
     minWidth: 400,

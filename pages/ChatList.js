@@ -45,8 +45,15 @@ export default function ChatList({
     setShowProfile(true);
   };
 
+  const turnOffLoader = () => {
+    setTimeout(() => {
+      setLoader(false);
+    }, 5000);
+  };
+
   const newContact = async () => {
     setLoader(true);
+    turnOffLoader();
     const un = await getLocal("myname");
     setProfileName(un);
     const { status } = await Contacts.requestPermissionsAsync();
