@@ -5,69 +5,60 @@ import { colors } from "../util/colors";
 import { spaces } from "../util/spaces";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function ChatMessage({ myphone, localData }) {
-  console.log("localdata", localData[0]);
+export default function ChatMessage({ chat, lastTime, myphone, next, online }) {
+  // console.log("lastTime", moment(lastTime).format("LT"), localData[0].time);
+  // console.log("lastTime", lastTime, localData[0].time);
 
+  const date = moment(chat.time).format("MMM Do YY");
+  const curr = moment(chat.time).format("MMM Do YY");
+  let prev = "";
+  const rt = chat.rt || chat.time;
+  // console.log("rt::lt", rt, lastTime);
+
+  if (next) prev = moment(next.time).format("MMM Do YY");
+  const showDate = () => {
+    const compareString = curr.localeCompare(prev);
+    if (compareString !== 0) {
+      return (
+        <View style={styles.chatDate}>
+          <Text style={styles.dateWrapper}>{date}</Text>
+        </View>
+      );
+    }
+  };
   return (
-    <View style={{ flexDirection: "column-reverse" }}>
-      {localData &&
-        localData?.map((chat, idx) => {
-          const date = moment(chat.time).format("MMM Do YY");
-          const curr = moment(chat.time).format("MMM Do YY");
-          let prev = "";
-          if (localData[idx + 1])
-            prev = moment(localData[idx + 1].time).format("MMM Do YY");
-          const showDate = () => {
-            const compareString = curr.localeCompare(prev);
-            if (compareString !== 0) {
-              return (
-                <View style={styles.chatDate}>
-                  <Text style={styles.dateWrapper}>{date}</Text>
-                </View>
-              );
-            }
-          };
-          return (
-            <View key={idx} style={styles.chatContainer}>
-              {showDate()}
-              <View
-                style={[
-                  styles.chatRegion,
-                  chat.from === myphone ? styles.rightSide : styles.leftSide,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.chat,
-                    chat.from === myphone ? styles.rightChat : styles.leftChat,
-                  ]}
-                >
-                  <Text style={styles.message}>{chat.msg}</Text>
-                  <Text
-                    style={[
-                      styles.time,
-                      chat.from === myphone
-                        ? styles.rightTime
-                        : styles.leftTime,
-                    ]}
-                  >
-                    {moment(chat.time).format("LT")}
-                    {chat.from == myphone && (
-                      <Ionicons
-                        // name={`checkmark${chat.status == 2 ? "-done" : ""}`}
-                        name={`checkmark-done`}
-                        size={18}
-                        color={
-                          chat.status == 2 ? colors.bluetick : colors.fnShade
-                        }
-                      />
-                    )}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          );
-        })}
+    <View style={styles.chatContainer}>
+      {showDate()}
+      <View
+        style={[
+          styles.chatRegion,
+          chat.from === myphone ? styles.rightSide : styles.leftSide,
+        ]}
+      >
+        <View
+          style={[
+            styles.chat,
+            chat.from === myphone ? styles.rightChat : styles.leftChat,
+          ]}
+        >
+          <Text style={styles.message}>{chat.msg}</Text>
+          <Text
+            style={[
+              styles.time,
+              chat.from === myphone ? styles.rightTime : styles.leftTime,
+            ]}
+          >
+            {moment(chat.time).format("LT")}
+            {chat.from == myphone && (
+              <Ionicons
+                name={`checkmark-done`}
+                size={18}
+                color={rt <= lastTime ? colors.bluetick : colors.fnShade}
+              />
+            )}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 }

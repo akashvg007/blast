@@ -6,12 +6,19 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { useSocket } from "../context/SocketProvider";
 import { spaces } from "../util/spaces";
 import ContactList from "../components/ContactList";
 import { colors } from "../util/colors";
 import { Button } from "react-native-paper";
 import * as Contacts from "expo-contacts";
-import { getLocalContacts, getLocal } from "../helper/logicHelper";
+import {
+  getLocalContacts,
+  getLocal,
+  getChatsFromLocal,
+  getUnreadMsg,
+  addToMessage,
+} from "../helper/logicHelper";
 import PhoneContacts from "./PhoneContacts";
 import Profile from "./Profile";
 import { Fullscreen } from "../components/Fullscreen";
@@ -32,19 +39,33 @@ export default function ChatList({
   const [profileName, setProfileName] = useState("");
   const [fullscreen, setFullscreen] = useState({});
   const [showSnack, setShowSnack] = useState(false);
+  const [unreadCount, setUnreadCount] = useState({});
+  const socket = useSocket();
 
   const handleSelected = (name) => {
+    setUnreadCount({});
     setCurrentUser(name);
   };
   const showContacts = async () => {
     const list = await getLocal("blastContact");
-    console.log("showContacts", list);
     setContactList(list);
     setShowContact(true);
   };
 
   const handleProfile = () => {
     setShowProfile(true);
+  };
+  const getNewChats = async (st = 0) => {
+    // console.log("newChat::St", st);
+    await getChatsFromLocal();
+    const unread = await getUnreadMsg();
+    // console.log("unread", unread);
+    setUnreadCount(unread);
+  };
+
+  const handleReceive = async (msgObj) => {
+    await addToMessage({ ...msgObj, rt: Date.now() });
+    getNewChats();
   };
 
   const turnOffLoader = () => {
@@ -57,7 +78,6 @@ export default function ChatList({
       const un = await getLocal("myname");
       setProfileName(un);
       const isAvailable = await Contacts.isAvailableAsync();
-      console.log("available", isAvailable);
       if (!isAvailable) alert("this device does not support contact api");
       const { granted } = await Contacts.requestPermissionsAsync();
       if (!granted) {
@@ -70,11 +90,17 @@ export default function ChatList({
       const resp = await Contacts.getContactsAsync({
         fields: [Contacts.Fields.PhoneNumbers],
       });
-      console.log("response", Object.keys(resp));
-      // alert("total contacts: " + resp.total);
       if (resp.data.length > 0) await getLocalContacts(resp.data);
     })();
+    getNewChats(1);
   }, []);
+
+  useEffect(() => {
+    if (socket != null) socket.on("receive-message", handleReceive);
+    return () => {
+      if (socket != null) socket.off("receive-message");
+    };
+  }, [socket]);
 
   const renderView = () => {
     if (showContact)
@@ -139,6 +165,8 @@ export default function ChatList({
                 handleSelected={handleSelected}
                 data={list[chat]}
                 joinedDate={undefined}
+                unreadCount={unreadCount[chat]}
+                resetUnread={setUnreadCount}
               />
             ))
           )}

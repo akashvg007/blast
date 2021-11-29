@@ -13,7 +13,7 @@ export const colors = {
   lightfncolor: "#303030",
   chatBg: "#f1f1f1",
   fngreen: "#1fa855",
-  fnShade: "rgba(0,0,0,0.45)",
+  fnShade: "rgba(0,0,0,0.5)",
   profileBg: "#ededed",
   bluetick: "#00a5f4",
 };

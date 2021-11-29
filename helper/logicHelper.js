@@ -42,7 +42,7 @@ export const getLocal = async (key, initial = "") => {
     const jsonValue = isJson(value) ? JSON.parse(value) : value;
     return jsonValue || initial;
   } catch (err) {
-    return "";
+    return initial;
   }
 };
 
@@ -52,39 +52,49 @@ export const setLocal = async (key, value) => {
   return true;
 };
 
+export const removeLocal = async (key) => {
+  await AsyncStorage.removeItem(key);
+  return true;
+};
+
 export const getChatsFromLocal = async () => {
   try {
     const lastChatGet = await getLocal("lastChatGet", "");
     const conversation = await getLocal("chats", {});
-    // console.log("getChat::last::con", lastChatGet, conversation);
-
     let last = 0;
     if (lastChatGet) last = lastChatGet;
     await setLocal("lastChatGet", Date.now());
-    const chats = await getRecentChats({ time: last });
+    const chats = await getRecentChats({ time: 0 });
     const newData = chats.concat(conversation);
-    await setLocal("chats", newData);
+    // need to work here to optimize the application
+    await setLocal("chats", chats);
   } catch (e) {
     //console.log("getChatsFromLocal", e);
   }
 };
 export const formateChats = async () => {
-  const users = {};
-  const chats = await getLocal("chats");
+  try {
+    const users = {};
+    const chats = await getLocal("chats");
+    const last = await getLocal("lastChatGet");
+    // console.log("chats", chats, last);
 
-  const myPhone = await getLocal("myphone");
-  //console.log('chats', chats)
-  if (!chats) return {};
-  chats.map((chat) => {
-    const { from = "", to = "", msg = "", time = 0, status = 1 } = chat;
-    if (!from || !to) return;
-    const user = from === myPhone ? to : from;
-    if (!users[user]) users[user] = [];
-    const obj = { msg, time, status, from, to };
-    users[user].push(obj);
-  });
-  await setLocal("localChat", users);
-  return users;
+    const myPhone = await getLocal("myphone");
+    if (!chats || !Array.isArray(chats)) return {};
+    chats.map((chat) => {
+      const { from = "", to = "", msg = "", time = 0, status = 1 } = chat;
+      if (!from || !to) return;
+      const user = from === myPhone ? to : from;
+      if (!users[user]) users[user] = [];
+      const obj = { msg, time, status, from, to };
+      users[user].push(obj);
+    });
+    await setLocal("localChat", users);
+    return users;
+  } catch (err) {
+    console.log("catch::formateChats", err.message);
+    return {};
+  }
 };
 export const getAllContacts = async () => {
   try {
@@ -124,7 +134,31 @@ export const clearAllStorage = () => {
     .then(() => alert("success"));
 };
 
-export const addToMessage = async ({ recipient, text, sender, status = 2 }) => {
+export const getUnreadMsg = async () => {
+  const localChat = await getLocal("localChat");
+  const myphone = await getLocal("myphone");
+  const unreadMap = {};
+  // console.log("keys", localChat["+918848275018"]);
+
+  Object.keys(localChat).forEach((k) => {
+    if (!unreadMap[k]) unreadMap[k] = 0;
+    localChat[k].forEach((x) => {
+      if (x.from !== myphone && x.status !== 2) {
+        console.log("unreadMesg", x);
+        unreadMap[k]++;
+      }
+    });
+  });
+  return unreadMap;
+};
+
+export const addToMessage = async ({
+  recipient,
+  text,
+  sender,
+  status = 2,
+  rt = Date.now(),
+}) => {
   const localChat = await getLocal("localChat", {});
   const messageObj = {
     msg: text,
@@ -132,6 +166,7 @@ export const addToMessage = async ({ recipient, text, sender, status = 2 }) => {
     from: sender,
     time: Date.now(),
     status,
+    rt,
   };
   // console.log("addtomessage", localChat, recipient);
   const myphone = await getLocal("myphone");
@@ -143,15 +178,38 @@ export const addToMessage = async ({ recipient, text, sender, status = 2 }) => {
 };
 export const getUpdatedMessage = async (recipient) => {
   const localChat = await getLocal("localChat");
+  const last100 = localChat[recipient] ? localChat[recipient].slice(0, 50) : [];
+  return last100;
   return localChat[recipient] || [];
 };
 
+export const updateLocalChatStatusAll = async (recipient) => {
+  const localChat = await getLocal("localChat");
+  const oneChat = localChat[recipient];
+  // console.log("keys", oneChat);
+  const newData = oneChat.map((chat) => ({ ...chat, status: 2 }));
+  localChat[recipient] = [...newData];
+  localChat[recipient].forEach((x) => {
+    if (x.status != 2) console.log("not 2", x);
+  });
+  const newObj = JSON.parse(JSON.stringify(localChat));
+  // await removeLocal("localChat");
+  const keys = await AsyncStorage.getAllKeys();
+  console.log("all keys", keys);
+  await AsyncStorage.flushGetRequests();
+  await setLocal("localChat", newObj);
+  console.log("all keys2", keys);
+};
+
 export const updateLocalChatStatus = async (recipient) => {
-  const localChat = await getUpdatedMessage(recipient);
-  localChat.map((chat) => {
+  const localChat = await getLocal("localChat");
+  const oneChat = localChat[recipient];
+  oneChat.map((chat) => {
     if (chat.from === recipient) return { ...chat, status: 2 };
     return chat;
   });
+  localChat[recipient] = oneChat;
+  await setLocal("localChat", localChat);
 };
 
 export const getLocalContacts = async (contacts) => {

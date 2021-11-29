@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, ScrollView, BackHandler } from "react-native";
 import moment from "moment";
 import { getLastSeen, updateStatus } from "../api/service";
-import { getLocal } from "../helper/logicHelper";
+import { getLocal, updateLocalChatStatusAll } from "../helper/logicHelper";
 import { colors } from "../util/colors";
 import { useSocket } from "../context/SocketProvider";
 import {
@@ -29,6 +29,7 @@ export default function ChatScreen({
   const [localData, setLocalData] = useState([]);
   const [online, setOnline] = useState("offline");
   const [lastSeen, SetLastSeen] = useState("");
+  const [reveicedmsgTime, setReceivedmsgTime] = useState(Date.now());
   const [showProfile, setShowProfile] = useState(false);
   const socket = useSocket();
 
@@ -56,17 +57,26 @@ export default function ChatScreen({
     setTextInput("");
   };
   const handleReceive = async (msgObj) => {
-    await addToMessage(msgObj);
+    await addToMessage({ ...msgObj, rt: Date.now() });
     const data = await getUpdatedMessage(name);
+    console.log("seen::emit", {
+      receiver: name,
+      time: Date.now(),
+      sender: myphone,
+    });
+
+    socket.emit("statusUpdate", {
+      receiver: name,
+      time: Date.now(),
+      sender: myphone,
+    });
     setLocalData(data);
+    console.log("update status");
+    updateStatus(msgObj.sender);
   };
   const backAction = () => {
     handleBack("");
     return true;
-  };
-  const getLocalChat = async () => {
-    await getChatsFromLocal();
-    props.getNew();
   };
   async function handleLastSeen() {
     const result = await getLastSeen({ phone: name });
@@ -76,6 +86,7 @@ export default function ChatScreen({
     const date = moment(time).calendar();
     SetLastSeen(date);
   }
+  // console.log("last msg", reveicedmsgTime);
 
   const checkOnline = async ({ ids, status }) => {
     if (ids && Array.isArray(ids) && ids.length && status == 1) {
@@ -86,6 +97,12 @@ export default function ChatScreen({
       setOnline("offline");
     }
   };
+  const lastStatusUpdateTime = ({ receiver, time, sender }) => {
+    // console.log("seen", receiver, name);
+    if (sender === name) {
+      setReceivedmsgTime(time);
+    }
+  };
   useEffect(() => {
     handleLastSeen();
   }, [name, online]);
@@ -93,29 +110,39 @@ export default function ChatScreen({
     if (socket == null) return;
     socket.on("online", checkOnline);
     socket.on("offline", checkOnline);
+    socket.on("status-update-last", lastStatusUpdateTime);
   }, [socket, checkOnline]);
 
+  const newMessages = async () => {
+    const phone = await getLocal("myphone");
+    setMyPhone(phone);
+    await updateStatus(name);
+    await updateLocalChatStatusAll(name);
+    const data = await getUpdatedMessage(name);
+    setLocalData(data);
+  };
+
   useEffect(() => {
-    getLocal("myphone").then((phone) => {
-      setMyPhone(phone);
-      getLocalChat();
-    });
+    newMessages();
     if (socket == null) return;
     socket.on("receive-message", handleReceive);
-    getUpdatedMessage(name).then((data) => setLocalData(data));
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
-    return () => backHandler.remove();
+    socket.emit("statusUpdate", {
+      receiver: name,
+      time: Date.now(),
+      sender: myphone,
+    });
+    return () => {
+      socket.off("receive-message");
+      socket.off("offline");
+      socket.off("offline");
+      socket.off("status-update-last");
+      backHandler.remove();
+    };
   }, []);
-
-  // useEffect(() => {
-  //   if (name){
-  //      updateStatus(name);
-
-  //     }
-  // }, [localData]);
 
   const handleProfile = () => {
     setShowProfile(true);
@@ -148,7 +175,19 @@ export default function ChatScreen({
         ref={scrollViewRef}
         onContentSizeChange={scrollDown}
       >
-        <ChatMessage myphone={myphone} localData={localData} />
+        <View style={{ flexDirection: "column-reverse" }}>
+          {localData &&
+            localData?.map((chat, idx) => (
+              <ChatMessage
+                key={chat.time}
+                lastTime={reveicedmsgTime}
+                myphone={myphone}
+                next={localData[idx + 1]}
+                chat={chat}
+                online={online}
+              />
+            ))}
+        </View>
       </ScrollView>
       <ChatInput text={textInput} setText={setTextInput} send={handleSend} />
     </View>

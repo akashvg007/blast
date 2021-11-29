@@ -4,6 +4,7 @@ import { spaces } from "../util/spaces";
 import { getLastMessageHelper } from "../helper/logicHelper";
 import { relativeTime } from "../helper/logicHelper";
 import { colors } from "../util/colors";
+import { Badge } from "react-native-paper";
 
 export default ({
   data = undefined,
@@ -13,6 +14,8 @@ export default ({
   newContact = false,
   joinedDate,
   viewDP,
+  unreadCount = 0,
+  resetUnread,
   ...props
 }) => {
   const [lastMsg, setLastMsg] = useState({});
@@ -23,9 +26,10 @@ export default ({
   if (props?.photo && props?.photo !== "") photo = props.photo;
   let contactName = contact || phone;
   if (!contact && phone === "+918848275018") contactName = "Admin";
-  // console.log("contactname", contact);
+  // console.log("unreadCount", unreadCount);
 
   const handlePress = () => {
+    resetUnread({});
     handleSelected(phone);
   };
   const lastMessage = () => {
@@ -36,8 +40,15 @@ export default ({
     return "";
   };
   const viewImage = (e) => {
+    if (joinedDate) return;
     e.stopPropagation();
     viewDP({ photo, contactName });
+  };
+  const dateColor = () => {
+    if (unreadCount > 0) {
+      return { color: colors.fngreen };
+    }
+    return { color: colors.fnShade };
   };
   useEffect(() => {
     if (data) getLastMessageHelper(data, setLastMsg);
@@ -54,7 +65,15 @@ export default ({
           <Text style={styles.text}>{contactName}</Text>
           {data && <Text style={styles.lastMsg}>{lastMessage()}</Text>}
         </View>
-        {data && <Text>{relativeTime(lastMsg.time)}</Text>}
+        <View>
+          {data && (
+            <Text style={[dateColor()]}>{relativeTime(lastMsg.time)}</Text>
+          )}
+          {!joinedDate && unreadCount > 0 && (
+            // <Text>15</Text>
+            <Badge style={styles.badge}>{unreadCount}</Badge>
+          )}
+        </View>
         {joinedDate && <Text>Joined on {relativeTime(joinedDate, 1)}</Text>}
       </View>
     </TouchableOpacity>
@@ -69,6 +88,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 70,
     width: "100%",
+  },
+  badge: {
+    color: colors.white,
+    backgroundColor: colors.fngreen,
   },
   lastMsgContainer: {
     flexDirection: "row",

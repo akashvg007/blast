@@ -207,7 +207,9 @@ export const removePhoto = async () => {
 
 export const updateStatus = async (phone) => {
   try {
-    const url = baseUrl + getEndpoint("statusUpdate", "phone", phone);
+    console.log("phone", phone);
+
+    const url = baseUrl + getEndpoint("statusUpdate") + "/" + phone;
     console.log("updateStatus::url", url);
     const result = await commonGet(url);
     return result;

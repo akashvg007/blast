@@ -35,8 +35,6 @@ export default function App() {
 
   const getAndSetNewChats = async () => {
     const users = await formateChats();
-    // console.log("users", users);
-
     setChatlist(users);
   };
   const getAndSetNewContacts = async () => {
@@ -66,6 +64,10 @@ export default function App() {
     setVerified(false);
     setInitial(false);
   };
+  // console.log("agree", agree);
+  // console.log("otpSend", otpSend);
+  // console.log("verified", verified);
+  // console.log("initial", initial);
 
   const handleUpdateLastTime = () => {
     setInterval(() => {
@@ -75,15 +77,20 @@ export default function App() {
 
   useEffect(() => {
     // clearAllStorage();
+
     handleUpdateLastTime();
-    getLocal("token").then(async (token) => {
-      if (token) {
-        setInitialStates();
-        getInitialValues();
-        getNewChats();
-        getAllContacts();
-      } else setStartVals();
-    });
+    getLocal("token")
+      .then(async (token) => {
+        if (token && typeof token === "string") {
+          setInitialStates();
+          getInitialValues();
+          getNewChats();
+          getAllContacts();
+        } else setStartVals();
+      })
+      .catch((err) => {
+        setStartVals();
+      });
   }, [verified]);
 
   const renderOtpPage = () => {
