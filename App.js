@@ -82,6 +82,8 @@ export default function App() {
     getLocal("token")
       .then(async (token) => {
         if (token && typeof token === "string") {
+          console.log("mytoken", token);
+
           setInitialStates();
           getInitialValues();
           getNewChats();

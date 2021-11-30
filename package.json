@@ -28,7 +28,8 @@
     "react-native-paper": "4.9.2",
     "react-native-raw-bottom-sheet": "^2.2.0",
     "react-native-web": "0.17.1",
-    "socket.io-client": "2.3.0"
+    "socket.io-client": "2.3.0",
+    "expo-notifications": "~0.13.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
