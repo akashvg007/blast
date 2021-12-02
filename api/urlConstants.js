@@ -20,6 +20,8 @@ export const endpoints = {
   getcontacts: "/getcontacts",
   addcontact: "/addcontact",
   upload: "/upload",
+  uploadFile: "/update_image",
+  uploadImage: "/upload/file",
   getAllContacts: "/getAllMyUserDetails",
   updateLastSeen: "/update-last-seen",
   getlastSeenL: "/get-last-seen",

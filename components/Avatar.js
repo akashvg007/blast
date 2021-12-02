@@ -37,6 +37,8 @@ const styles = StyleSheet.create({
   group: {
     alignItems: "center",
     width: "100%",
+    marginLeft: 30,
+    marginRight: 30,
   },
   row: {
     flexDirection: "row",

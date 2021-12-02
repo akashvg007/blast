@@ -6,14 +6,20 @@ import AvatarGrp from "./Avatar";
 import { uploadImages, removePhoto } from "../api/service";
 import * as ImagePicker from "expo-image-picker";
 
-export default function ProfileChangeOptions({ setDp }) {
+export default function ProfileChangeOptions({ setDp, setLoader }) {
   const uploadToServer = async (resp) => {
     if (!resp.cancelled) {
-      const { uri } = resp;
-      const body = new FormData();
-      body.append("file", uri);
-      await uploadImages(body);
+      setLoader(true);
+      const { uri, type } = resp;
       setDp(uri);
+      const body = new FormData();
+      body.append("file", {
+        uri,
+        name: new Date() + "_profile",
+        type: "image/" + type,
+      });
+      await uploadImages(body);
+      setLoader(false);
     }
   };
   const handleGallery = async () => {
@@ -42,6 +48,8 @@ export default function ProfileChangeOptions({ setDp }) {
       quality: 0.9,
     };
     const result = await ImagePicker.launchCameraAsync(options);
+    console.log("camera::result", result);
+
     uploadToServer(result);
   };
   const data = [

@@ -72,7 +72,7 @@ export default function App() {
   const handleUpdateLastTime = () => {
     setInterval(() => {
       updateLastSeen();
-    }, 60000);
+    }, 100000);
   };
 
   useEffect(() => {

@@ -37,17 +37,21 @@ const commonPostFormData = async (url, payload) => {
   try {
     const token = await AsyncStorage.getItem("token");
     let resp;
+
     if (token) {
+      console.log("cmdPFD::tkn", token, payload, url);
       resp = await axios.post(url, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
+          Accept: "application/json",
         },
       });
     } else resp = await axios.post(url, payload);
     if (resp.status == 200) return resp?.data.data;
   } catch (err) {
-    //console.log("something went wrong::commonGet", err.message);
+    console.log("something went wrong::commonPostFormData", err);
+    return {};
   }
 };
 
@@ -179,10 +183,15 @@ export const getAllBlastContacts = async (payload) => {
 export const uploadImages = async (payload) => {
   try {
     const url = baseUrl + getEndpoint("upload");
+    // const url = baseUrl + getEndpoint("uploadImage");
+    console.log("upload api url", url);
     const result = await commonPostFormData(url, payload);
+    // const result = await commonPost(url, payload);
+    console.log("upload Image", result);
     return result;
   } catch (err) {
-    console.log("something went wrong", err.message);
+    console.log("something went wrong", err);
+    return {};
   }
 };
 export const updateName = async (payload) => {

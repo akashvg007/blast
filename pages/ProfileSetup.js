@@ -25,7 +25,7 @@ export default function ProfileSetup({ dp, setValues, phone, getProfilePic }) {
   return (
     <View style={styles.container}>
       <Header text="Profile" />
-      <Uploader dp={dp} getProfilePic={getProfilePic} name={name} />
+      <Uploader dp={dp} getProfilePic={getProfilePic} name={name} edit={true} />
       <InputText label="Enter Your Name" value={name} onChange={setName} />
       <ButtonGrp data={btns} />
     </View>

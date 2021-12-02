@@ -29,7 +29,7 @@ export default ({
   // console.log("unreadCount", unreadCount);
 
   const handlePress = () => {
-    resetUnread({});
+    if (resetUnread) resetUnread({});
     handleSelected(phone);
   };
   const lastMessage = () => {
