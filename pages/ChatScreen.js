@@ -13,8 +13,9 @@ import {
 import Profile from "./Profile";
 import { links } from "../util/links";
 import ChatHeader from "../components/ChatHeader";
-import ChatInput from "../components/ChatInput";
+// import ChatInput from "../components/ChatInput";
 import ChatMessage from "../components/ChatMessage";
+import ChatInput from "../components/ChatInput2";
 
 export default function ChatScreen({
   photo,
@@ -32,6 +33,17 @@ export default function ChatScreen({
   const [reveicedmsgTime, setReceivedmsgTime] = useState(Date.now());
   const [showProfile, setShowProfile] = useState(false);
   const socket = useSocket();
+  const [reply, setReply] = useState("");
+  const [isLeft, setIsLeft] = useState();
+
+  const swipeToReply = (message, isLeft) => {
+    setReply(message.length > 50 ? message.slice(0, 50) + "..." : message);
+    setIsLeft(isLeft);
+  };
+
+  const closeReply = () => {
+    setReply("");
+  };
 
   const scrollViewRef = useRef(null);
   const scrollDown = () =>
@@ -179,6 +191,7 @@ export default function ChatScreen({
           {localData &&
             localData?.map((chat, idx) => (
               <ChatMessage
+                onSwipeToReply={swipeToReply}
                 key={chat.time}
                 lastTime={reveicedmsgTime}
                 myphone={myphone}
@@ -189,7 +202,16 @@ export default function ChatScreen({
             ))}
         </View>
       </ScrollView>
-      <ChatInput text={textInput} setText={setTextInput} send={handleSend} />
+      {/* <ChatInput text={textInput} setText={setTextInput} send={handleSend} /> */}
+      <ChatInput
+        reply={reply}
+        isLeft={isLeft}
+        closeReply={closeReply}
+        username={contactName}
+        text={textInput}
+        setText={setTextInput}
+        send={handleSend}
+      />
     </View>
   );
 }

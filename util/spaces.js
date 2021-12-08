@@ -5,5 +5,8 @@ export const spaces = {
   lg: 28,
   xl: 32,
   xxl: 40,
-  xxxl: 50
-}
+  xxxl: 50,
+  title: 18,
+  subTitle: 13,
+  message: 15,
+};

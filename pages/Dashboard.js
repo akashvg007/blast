@@ -39,7 +39,7 @@ const registerForPushNotificationsAsync = async () => {
       name: "default",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#FF231F7C",
+      lightColor: "#c4c4cc",
     });
   }
   return token;
@@ -71,7 +71,7 @@ export default function Dashboard({
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        console.log("notification received", response);
       });
 
     return () => {
