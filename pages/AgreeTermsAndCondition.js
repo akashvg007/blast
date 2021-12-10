@@ -1,9 +1,9 @@
-import React from "react";
+import React, { memo } from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
 import RoundedButton from "../components/RoundedButton";
 import { spaces } from "../util/spaces";
 
-export default ({ onAgree }) => {
+export default memo(({ onAgree }) => {
   const handlePress = (e) => {
     onAgree(true);
   };
@@ -25,7 +25,7 @@ export default ({ onAgree }) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

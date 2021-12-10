@@ -2,7 +2,7 @@
   "expo": {
     "name": "Blast",
     "slug": "blast",
-    "version": "1.0.22",
+    "version": "1.0.23",
     "orientation": "portrait",
     "icon": "./assets/logo2.png",
     "plugins": [

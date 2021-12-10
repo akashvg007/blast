@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { Text, View, StyleSheet, TextInput } from "react-native";
 import { spaces } from "../util/spaces";
 import { registerUser } from "../api/service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ButtonGrp } from "../components/ButtonGroup";
 
-export default ({ setOtpSend, setAgree }) => {
+export default memo(({ setOtpSend, setAgree }) => {
   const [number, setNumber] = useState("");
 
   const handlePress = async () => {
@@ -51,7 +51,7 @@ export default ({ setOtpSend, setAgree }) => {
       <ButtonGrp data={btns} />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   top: {

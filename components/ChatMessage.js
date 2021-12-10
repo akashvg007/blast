@@ -1,11 +1,18 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import moment, { fn } from "moment";
 import { colors } from "../util/colors";
 import { spaces } from "../util/spaces";
 import { Ionicons } from "@expo/vector-icons";
+import Message from "./message/Message";
 
-export default function ChatMessage({ chat, lastTime, myphone, next, online }) {
+export default memo(function ChatMessage({
+  chat,
+  lastTime,
+  myphone,
+  next,
+  onSwipeToReply,
+}) {
   // console.log("lastTime", moment(lastTime).format("LT"), localData[0].time);
   // console.log("lastTime", lastTime, localData[0].time);
 
@@ -14,6 +21,11 @@ export default function ChatMessage({ chat, lastTime, myphone, next, online }) {
   let prev = "";
   const rt = chat.rt || chat.time;
   // console.log("rt::lt", rt, lastTime);
+
+  const swipeToReply = (message, isLeft) => {
+    // setReply(message.length > 50 ? message.slice(0, 50) + '...' : message);
+    // setIsLeft(isLeft);
+  };
 
   if (next) prev = moment(next.time).format("MMM Do YY");
   const showDate = () => {
@@ -28,8 +40,13 @@ export default function ChatMessage({ chat, lastTime, myphone, next, online }) {
   };
   return (
     <View style={styles.chatContainer}>
-      {showDate()}
-      <View
+      {/* {showDate()} */}
+      <Message
+        isLeft={chat.from !== myphone}
+        onSwipe={swipeToReply}
+        chat={chat}
+      />
+      {/* <View
         style={[
           styles.chatRegion,
           chat.from === myphone ? styles.rightSide : styles.leftSide,
@@ -58,10 +75,10 @@ export default function ChatMessage({ chat, lastTime, myphone, next, online }) {
             )}
           </Text>
         </View>
-      </View>
+      </View> */}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   chatContainer: {

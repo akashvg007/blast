@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 import { View, StyleSheet, ScrollView, BackHandler } from "react-native";
 import moment from "moment";
 import { getLastSeen, updateStatus } from "../api/service";
-import { getLocal, updateLocalChatStatusAll } from "../helper/logicHelper";
+import {
+  addToLocal,
+  getLocal,
+  updateLocalChatStatusAll,
+} from "../helper/logicHelper";
 import { colors } from "../util/colors";
 import { useSocket } from "../context/SocketProvider";
 import {
@@ -16,8 +20,9 @@ import ChatHeader from "../components/ChatHeader";
 // import ChatInput from "../components/ChatInput";
 import ChatMessage from "../components/ChatMessage";
 import ChatInput from "../components/ChatInput2";
+import { ActivityIndicator } from "react-native-paper";
 
-export default function ChatScreen({
+export default memo(function ChatScreen({
   photo,
   name,
   contact,
@@ -35,6 +40,7 @@ export default function ChatScreen({
   const socket = useSocket();
   const [reply, setReply] = useState("");
   const [isLeft, setIsLeft] = useState();
+  const [loader, setLoader] = useState(false);
 
   const swipeToReply = (message, isLeft) => {
     setReply(message.length > 50 ? message.slice(0, 50) + "..." : message);
@@ -57,6 +63,9 @@ export default function ChatScreen({
 
   const handleSend = async () => {
     if (!textInput || textInput === "") return;
+    // const data = await getUpdatedMessage(name);
+    const data = await addToLocal({ from: myphone, msg: textInput, to: name });
+    setLocalData(data);
     socket.emit("send-message", { recipient: name, text: textInput });
     await addToMessage({
       recipient: name,
@@ -64,8 +73,6 @@ export default function ChatScreen({
       sender: myphone,
       status: 1,
     });
-    const data = await getUpdatedMessage(name);
-    setLocalData(data);
     setTextInput("");
   };
   const handleReceive = async (msgObj) => {
@@ -126,12 +133,14 @@ export default function ChatScreen({
   }, [socket, checkOnline]);
 
   const newMessages = async () => {
+    setLoader(true);
     const phone = await getLocal("myphone");
     setMyPhone(phone);
     await updateStatus(name);
-    await updateLocalChatStatusAll(name);
-    const data = await getUpdatedMessage(name);
+    const data = await updateLocalChatStatusAll(name, 100);
     setLocalData(data);
+    setLoader(false);
+    scrollDown();
   };
 
   useEffect(() => {
@@ -182,39 +191,46 @@ export default function ChatScreen({
         name={contactName}
         lastSeen={lastSeen}
       />
-      <ScrollView
-        style={styles.scroll}
-        ref={scrollViewRef}
-        onContentSizeChange={scrollDown}
-      >
-        <View style={{ flexDirection: "column-reverse" }}>
-          {localData &&
-            localData?.map((chat, idx) => (
-              <ChatMessage
-                onSwipeToReply={swipeToReply}
-                key={chat.time}
-                lastTime={reveicedmsgTime}
-                myphone={myphone}
-                next={localData[idx + 1]}
-                chat={chat}
-                online={online}
-              />
-            ))}
+      {loader ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size={100} color={colors.prgreen} />
         </View>
-      </ScrollView>
-      {/* <ChatInput text={textInput} setText={setTextInput} send={handleSend} /> */}
-      <ChatInput
-        reply={reply}
-        isLeft={isLeft}
-        closeReply={closeReply}
-        username={contactName}
-        text={textInput}
-        setText={setTextInput}
-        send={handleSend}
-      />
+      ) : (
+        <>
+          <ScrollView
+            style={styles.scroll}
+            ref={scrollViewRef}
+            onContentSizeChange={scrollDown}
+          >
+            <View style={{ flexDirection: "column-reverse" }}>
+              {localData &&
+                localData?.map((chat, idx) => (
+                  <ChatMessage
+                    onSwipeToReply={swipeToReply}
+                    key={chat.time}
+                    lastTime={reveicedmsgTime}
+                    myphone={myphone}
+                    next={localData[idx + 1]}
+                    chat={chat}
+                  />
+                ))}
+            </View>
+          </ScrollView>
+          {/* <ChatInput text={textInput} setText={setTextInput} send={handleSend} /> */}
+          <ChatInput
+            reply={reply}
+            isLeft={isLeft}
+            closeReply={closeReply}
+            username={contactName}
+            text={textInput}
+            setText={setTextInput}
+            send={handleSend}
+          />
+        </>
+      )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -225,5 +241,10 @@ const styles = StyleSheet.create({
   },
   scroll: {
     backgroundColor: colors.chatBg,
+  },
+  loader: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

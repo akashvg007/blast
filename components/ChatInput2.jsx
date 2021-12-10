@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from "react";
+import React, { useState, useEffect, memo } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TextInput,
   Platform,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 
 import Animated, {
@@ -18,102 +19,100 @@ import Animated, {
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import EmojiPicker from "./emojis/EmojiPicker";
 
-import { useKeyboard } from "@react-native-community/hooks";
 import { colors } from "../util/colors";
 
-const ChatInput2 = ({
-  reply,
-  closeReply,
-  isLeft,
-  username,
-  send,
-  setText,
-  text,
-}) => {
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const height = useSharedValue(70);
-  const keyboard = useKeyboard();
+const ChatInput2 = memo(
+  ({ reply, closeReply, isLeft, username, send, setText, text }) => {
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const height = useSharedValue(70);
 
-  const handlePress = (value) => {
-    console.log("value is", value);
+    const handlePress = (value) => {
+      console.log("value is", value);
 
-    const msg = text + value;
-    setText(msg);
-  };
-
-  useEffect(() => {
-    if (showEmojiPicker) {
-      height.value = withTiming(400);
-    } else {
-      height.value = reply ? withSpring(130) : withSpring(70);
-    }
-  }, [showEmojiPicker]);
-
-  useEffect(() => {
-    if (reply) {
-      height.value = showEmojiPicker ? withTiming(450) : withTiming(130);
-    } else {
-      height.value = showEmojiPicker ? withSpring(400) : withSpring(70);
-    }
-  }, [reply]);
-
-  const heightAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      height: height.value,
+      const msg = text + value;
+      setText(msg);
     };
-  });
 
-  return (
-    <Animated.View style={[styles.container, heightAnimatedStyle]}>
-      {reply ? (
-        <View style={styles.replyContainer}>
-          <TouchableOpacity onPress={closeReply} style={styles.closeReply}>
-            <Icon name="close" color="#000" size={20} />
-          </TouchableOpacity>
-          <Text style={styles.title}>
-            Response to {isLeft ? username : "Me"}
-          </Text>
-          <Text style={styles.reply}>{reply}</Text>
-        </View>
-      ) : null}
-      <View style={styles.innerContainer}>
-        <View style={styles.inputAndMicrophone}>
-          <TouchableOpacity
-            style={styles.emoticonButton}
-            onPress={() => setShowEmojiPicker((value) => !value)}
-          >
+    useEffect(() => {
+      if (showEmojiPicker) {
+        height.value = withTiming(400);
+      } else {
+        height.value = reply ? withSpring(130) : withSpring(70);
+      }
+    }, [showEmojiPicker]);
+
+    useEffect(() => {
+      if (reply) {
+        height.value = showEmojiPicker ? withTiming(450) : withTiming(130);
+      } else {
+        height.value = showEmojiPicker ? withSpring(400) : withSpring(70);
+      }
+    }, [reply]);
+
+    const heightAnimatedStyle = useAnimatedStyle(() => {
+      return {
+        height: height.value,
+      };
+    });
+
+    const handleShowEmoji = () => {
+      const value = !showEmojiPicker;
+      setShowEmojiPicker(value);
+      if (value) Keyboard.dismiss();
+    };
+
+    return (
+      <Animated.View style={[styles.container, heightAnimatedStyle]}>
+        {reply ? (
+          <View style={styles.replyContainer}>
+            <TouchableOpacity onPress={closeReply} style={styles.closeReply}>
+              <Icon name="close" color="#000" size={20} />
+            </TouchableOpacity>
+            <Text style={styles.title}>
+              Response to {isLeft ? username : "Me"}
+            </Text>
+            <Text style={styles.reply}>{reply}</Text>
+          </View>
+        ) : null}
+        <View style={styles.innerContainer}>
+          <View style={styles.inputAndMicrophone}>
+            <TouchableOpacity
+              style={styles.emoticonButton}
+              onPress={handleShowEmoji}
+            >
+              <Icon
+                name={showEmojiPicker ? "close" : "emoticon-outline"}
+                size={23}
+                color={colors.description}
+              />
+            </TouchableOpacity>
+            <TextInput
+              multiline
+              placeholder={"Type something..."}
+              style={styles.input}
+              value={text}
+              onChangeText={(text) => setText(text)}
+            />
+            <TouchableOpacity style={styles.rightIconButtonStyle}>
+              <Icon name="paperclip" size={23} color={colors.description} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.rightIconButtonStyle}>
+              <Icon name="camera" size={23} color={colors.description} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.sendButton} onPress={send}>
             <Icon
-              name={showEmojiPicker ? "keyboard" : "emoticon-outline"}
+              name={text ? "send" : "microphone"}
               size={23}
-              color={colors.description}
+              color={colors.white}
             />
           </TouchableOpacity>
-          <TextInput
-            multiline
-            placeholder={"Type something..."}
-            style={styles.input}
-            value={text}
-            onChangeText={(text) => setText(text)}
-          />
-          <TouchableOpacity style={styles.rightIconButtonStyle}>
-            <Icon name="paperclip" size={23} color={colors.description} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.rightIconButtonStyle}>
-            <Icon name="camera" size={23} color={colors.description} />
-          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.sendButton} onPress={send}>
-          <Icon
-            name={text ? "send" : "microphone"}
-            size={23}
-            color={colors.white}
-          />
-        </TouchableOpacity>
-      </View>
-      <EmojiPicker press={handlePress} />
-    </Animated.View>
-  );
-};
+        <EmojiPicker press={handlePress} />
+      </Animated.View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {

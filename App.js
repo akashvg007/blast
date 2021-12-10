@@ -64,15 +64,10 @@ export default function App() {
     setVerified(false);
     setInitial(false);
   };
-  // console.log("agree", agree);
-  // console.log("otpSend", otpSend);
-  // console.log("verified", verified);
-  // console.log("initial", initial);
-
   const handleUpdateLastTime = () => {
     setInterval(() => {
       updateLastSeen();
-    }, 100000);
+    }, 60000);
   };
 
   useEffect(() => {
@@ -82,8 +77,6 @@ export default function App() {
     getLocal("token")
       .then(async (token) => {
         if (token && typeof token === "string") {
-          console.log("mytoken", token);
-
           setInitialStates();
           getInitialValues();
           getNewChats();

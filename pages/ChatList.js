@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import {
   Text,
   View,
@@ -24,7 +24,7 @@ import Profile from "./Profile";
 import { Fullscreen } from "../components/Fullscreen";
 import { SnackBar } from "../components/SnackBar";
 
-export default function ChatList({
+export default memo(function ChatList({
   list = {},
   contact = {},
   profiles,
@@ -179,9 +179,8 @@ export default function ChatList({
       </>
     );
   };
-
   return renderView();
-}
+});
 
 const styles = StyleSheet.create({
   heading: {

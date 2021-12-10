@@ -7,7 +7,7 @@ import categories from "../../data/categories";
 import EmojiCategory from "./EmojiCategory";
 import TabBar from "./TabBar";
 
-const EmojiPicker = ({ press }) => {
+const EmojiPicker = memo(({ press }) => {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const [routes, setRoutes] = useState(
@@ -27,6 +27,6 @@ const EmojiPicker = ({ press }) => {
       initialLayout={{ width: layout.width }}
     />
   );
-};
+});
 
 export default memo(EmojiPicker);

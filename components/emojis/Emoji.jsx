@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 import shortnameToUnicode from "../../helper/shortnameToUnicode";
 
-const Emoji = ({ item, press }) => {
+const Emoji = memo(({ item, press }) => {
   return (
     <TouchableOpacity
       style={styles.emojiContainer}
@@ -12,7 +12,7 @@ const Emoji = ({ item, press }) => {
       <Text style={styles.emoji}>{shortnameToUnicode[`:${item}:`]}</Text>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   emojiContainer: {

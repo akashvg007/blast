@@ -1,11 +1,11 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import { colors } from "../util/colors";
 import { spaces } from "../util/spaces";
 import { IconButton } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
 
-export default function ChatHeader({
+export default memo(function ChatHeader({
   DP,
   back,
   profile,
@@ -51,7 +51,7 @@ export default function ChatHeader({
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   hleft: {

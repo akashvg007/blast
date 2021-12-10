@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, memo } from "react";
 import Constants from "expo-constants";
 import { View, StyleSheet, Platform } from "react-native";
 import ChatScreen from "./ChatScreen";
@@ -45,7 +45,7 @@ const registerForPushNotificationsAsync = async () => {
   return token;
 };
 
-export default function Dashboard({
+export default memo(function Dashboard({
   list = {},
   contact = {},
   profiles,
@@ -104,7 +104,7 @@ export default function Dashboard({
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { colors } from "../util/colors";
 import { InputText } from "../components/InputText";
@@ -8,7 +8,12 @@ import { Uploader } from "../components/Uploader";
 import { updateName } from "../api/service";
 import { setLocal } from "../helper/logicHelper";
 
-export default function ProfileSetup({ dp, setValues, phone, getProfilePic }) {
+export default memo(function ProfileSetup({
+  dp,
+  setValues,
+  phone,
+  getProfilePic,
+}) {
   const [name, setName] = useState("");
 
   const handlePress = async () => {
@@ -30,7 +35,7 @@ export default function ProfileSetup({ dp, setValues, phone, getProfilePic }) {
       <ButtonGrp data={btns} />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

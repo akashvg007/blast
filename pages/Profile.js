@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { View, StyleSheet, BackHandler } from "react-native";
 import { colors } from "../util/colors";
 import Header from "../components/Header";
@@ -8,7 +8,7 @@ import Space from "../components/Space";
 import { Fullscreen } from "../components/Fullscreen";
 import { getLocal } from "../helper/logicHelper";
 
-export default function Profile({
+export default memo(function Profile({
   dp,
   back,
   myphone,
@@ -54,7 +54,7 @@ export default function Profile({
       <ProfileText title={myphone} label="Phone" />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

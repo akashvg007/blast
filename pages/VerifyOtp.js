@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import { spaces } from "../util/spaces";
 // import { countryList } from '../util/data';
@@ -12,7 +12,7 @@ import {
 } from "../helper/logicHelper";
 import { ButtonGrp } from "../components/ButtonGroup";
 
-export default ({ setVerified }) => {
+export default memo(({ setVerified }) => {
   const [otp, setOtp] = useState("");
 
   const getInitialDetails = async () => {
@@ -49,7 +49,7 @@ export default ({ setVerified }) => {
       <ButtonGrp data={btns} />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

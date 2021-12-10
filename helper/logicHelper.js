@@ -63,11 +63,11 @@ export const getChatsFromLocal = async () => {
     const conversation = await getLocal("chats", {});
     let last = 0;
     if (lastChatGet) last = lastChatGet;
-    await setLocal("lastChatGet", Date.now());
-    const chats = await getRecentChats({ time: 0 });
+    setLocal("lastChatGet", Date.now());
+    const chats = await getRecentChats({ time: last });
     const newData = chats.concat(conversation);
     // need to work here to optimize the application
-    await setLocal("chats", chats);
+    await setLocal("chats", newData);
   } catch (e) {
     //console.log("getChatsFromLocal", e);
   }
@@ -178,27 +178,28 @@ export const addToMessage = async ({
 };
 export const getUpdatedMessage = async (recipient) => {
   const localChat = await getLocal("localChat");
-  const last100 = localChat[recipient] ? localChat[recipient].slice(0, 50) : [];
+  const last100 = localChat[recipient]
+    ? localChat[recipient].slice(0, 100)
+    : [];
   return last100;
-  return localChat[recipient] || [];
 };
 
-export const updateLocalChatStatusAll = async (recipient) => {
+export const addToLocal = async (obj) => {
+  const { to } = obj;
+  obj.time = Date.now();
+  obj.status = 1;
+  const localChat = await getLocal("localChat");
+  const last100 = localChat[to] ? localChat[to].slice(0, 100) : [];
+  return [obj, ...last100];
+};
+
+export const updateLocalChatStatusAll = async (recipient, rows) => {
   const localChat = await getLocal("localChat");
   const oneChat = localChat[recipient];
-  // console.log("keys", oneChat);
   const newData = oneChat.map((chat) => ({ ...chat, status: 2 }));
   localChat[recipient] = [...newData];
-  localChat[recipient].forEach((x) => {
-    if (x.status != 2) console.log("not 2", x);
-  });
-  const newObj = JSON.parse(JSON.stringify(localChat));
-  // await removeLocal("localChat");
-  const keys = await AsyncStorage.getAllKeys();
-  console.log("all keys", keys);
-  await AsyncStorage.flushGetRequests();
-  await setLocal("localChat", newObj);
-  console.log("all keys2", keys);
+  await setLocal("localChat", localChat);
+  return newData.slice(0, rows);
 };
 
 export const updateLocalChatStatus = async (recipient) => {
