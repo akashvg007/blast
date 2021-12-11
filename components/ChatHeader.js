@@ -1,9 +1,10 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import { colors } from "../util/colors";
 import { spaces } from "../util/spaces";
 import { IconButton } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
+import MenuWrapper from "./Menu/Menu";
 
 export default memo(function ChatHeader({
   DP,
@@ -12,6 +13,7 @@ export default memo(function ChatHeader({
   online,
   name,
   lastSeen,
+  handleMenuPress,
 }) {
   return (
     <View style={styles.heading}>
@@ -36,18 +38,19 @@ export default memo(function ChatHeader({
         </View>
       </View>
       <View>
-        <Entypo
-          style={styles.menu}
-          name="dots-three-vertical"
-          size={24}
-          onPress={() => console.log("Pressed")}
-          color={colors.white}
+        <IconButton
+          icon={(prop) => (
+            <Entypo
+              style={styles.menu}
+              name="dots-three-vertical"
+              size={20}
+              color={colors.white}
+            />
+          )}
+          centered={true}
+          size={22}
+          onPress={handleMenuPress}
         />
-        {/* <IconButton
-          icon="email"
-          size={20}
-          onPress={() => console.log("Pressed")}
-        /> */}
       </View>
     </View>
   );

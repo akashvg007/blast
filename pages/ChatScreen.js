@@ -21,6 +21,8 @@ import ChatHeader from "../components/ChatHeader";
 import ChatMessage from "../components/ChatMessage";
 import ChatInput from "../components/ChatInput2";
 import { ActivityIndicator } from "react-native-paper";
+import MenuWrapper from "../components/Menu/Menu";
+import PopupSheet from "../components/PopupSheet/PopupSheet";
 
 export default memo(function ChatScreen({
   photo,
@@ -41,7 +43,11 @@ export default memo(function ChatScreen({
   const [reply, setReply] = useState("");
   const [isLeft, setIsLeft] = useState();
   const [loader, setLoader] = useState(false);
+  const [show, setShow] = useState(false);
 
+  const handleMenuPress = () => {
+    setShow(!show);
+  };
   const swipeToReply = (message, isLeft) => {
     setReply(message.length > 50 ? message.slice(0, 50) + "..." : message);
     setIsLeft(isLeft);
@@ -190,6 +196,7 @@ export default memo(function ChatScreen({
         online={online}
         name={contactName}
         lastSeen={lastSeen}
+        handleMenuPress={handleMenuPress}
       />
       {loader ? (
         <View style={styles.loader}>
@@ -226,6 +233,11 @@ export default memo(function ChatScreen({
             setText={setTextInput}
             send={handleSend}
           />
+          <PopupSheet open={show} setOpen={setShow} height={300}>
+            <View style={styles.sheetWrapper}>
+              <MenuWrapper />
+            </View>
+          </PopupSheet>
         </>
       )}
     </View>
@@ -238,6 +250,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     color: colors.black,
     width: "100%",
+    position: "relative",
+  },
+  sheetWrapper: {
+    height: 290,
+    backgroundColor: colors.bgshade,
   },
   scroll: {
     backgroundColor: colors.chatBg,

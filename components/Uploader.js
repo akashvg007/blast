@@ -5,11 +5,13 @@ import { links } from "../util/links";
 import { colors } from "../util/colors";
 import RBSheet from "react-native-raw-bottom-sheet";
 import ProfileChangeOptions from "./ProfileChangeOption";
+import PopupSheet from "./PopupSheet/PopupSheet";
 
 export const Uploader = ({ dp, edit = false, getProfilePic, showImg }) => {
   const [profileImg, setProfileImg] = useState(links.avatar);
   const [loader, setLoader] = useState(false);
-  const refRBSheet = useRef();
+  const [open, setOpen] = useState(false);
+  // const refRBSheet = useRef();
 
   useEffect(() => {
     if (dp) setProfileImg(dp);
@@ -21,7 +23,7 @@ export const Uploader = ({ dp, edit = false, getProfilePic, showImg }) => {
   }, [profileImg]);
 
   const pickImage = async () => {
-    refRBSheet.current.open();
+    setOpen(!open);
   };
   return (
     <View style={styles.imageContainer}>
@@ -50,22 +52,9 @@ export const Uploader = ({ dp, edit = false, getProfilePic, showImg }) => {
           />
         </View>
       )}
-      <RBSheet
-        ref={refRBSheet}
-        closeOnDragDown={true}
-        closeOnPressMask={true}
-        height={200}
-        customStyles={{
-          wrapper: {
-            backgroundColor: "transparent",
-          },
-          draggableIcon: {
-            backgroundColor: "#000",
-          },
-        }}
-      >
+      <PopupSheet open={open} setOpen={setOpen}>
         <ProfileChangeOptions setDp={setProfileImg} setLoader={setLoader} />
-      </RBSheet>
+      </PopupSheet>
     </View>
   );
 };
@@ -80,8 +69,8 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     position: "absolute",
-    right: 90,
-    bottom: 18,
+    right: 95,
+    bottom: 28,
     height: 50,
     width: 50,
     backgroundColor: colors.bggreen,
